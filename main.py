@@ -25,7 +25,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
         QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
         QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget)
+        QVBoxLayout, QWidget,QLCDNumber)
 
 class ApplicationWindow(QtWidgets.QMainWindow):
     '''
@@ -53,6 +53,57 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         # 3. Show
         self.show()
         return
+    
+    def createBoxtime(self):
+        #Groupbox for Time Settings
+        self.timeBox = QGroupBox("Zeit")
+        layout = QHBoxLayout()
+
+        self.lcd_time = QLCDNumber()
+        self.lcd_time.display(100)
+
+
+        dial_time = QDial()
+        dial_time.setValue(30)
+        dial_time.setNotchesVisible(True)
+
+        layout.addWidget(dial_time)
+        layout.addWidget(self.lcd_time)
+        self.timeBox.setLayout(layout)
+
+    def createBoxVoltage(self):
+        #Groupbox for Voltage Settings
+        self.VoltageBox = QGroupBox("Voltage")
+        layout = QHBoxLayout()
+
+        self.lcd_voltage = QLCDNumber()
+        self.lcd_voltage.display(100)
+
+
+        dial_voltage = QDial()
+        dial_voltage.setValue(30)
+        dial_voltage.setNotchesVisible(True)
+
+        layout.addWidget(dial_voltage)
+        layout.addWidget(self.lcd_voltage)
+        self.VoltageBox.setLayout(layout)
+
+    def createBoxTrigger(self):
+        #Groupbox for Voltage Settings
+        self.TriggerBox = QGroupBox("Trigger")
+        layout = QHBoxLayout()
+
+        self.lcd_trigger = QLCDNumber()
+        self.lcd_trigger.display(100)
+
+
+        dial_trigger = QDial()
+        dial_trigger.setValue(30)
+        dial_trigger.setNotchesVisible(True)
+
+        layout.addWidget(dial_trigger)
+        layout.addWidget(self.lcd_trigger)
+        self.TriggerBox.setLayout(layout)
 
     def createTopLeftGroupBox(self):
         self.topLeftGroupBox = QGroupBox("Graph")
@@ -66,32 +117,31 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.topLeftGroupBox.setLayout(layout)
 
     def createTopRightGroupBox(self):
+        self.createBoxtime()
+        self.createBoxVoltage()
+        self.createBoxTrigger()
+
         self.topRightGroupBox = QGroupBox("Einstellungen")
 
-        dial_time = QDial()
-        dial_time.setValue(30)
-        dial_time.setNotchesVisible(True)
-
-        dial_voltage = QDial()
-        dial_voltage.setValue(30)
-        dial_voltage.setNotchesVisible(True)
-
-        dial_trigger = QDial()
-        dial_trigger.setValue(30)
-        dial_trigger.setNotchesVisible(True)
-
         layout = QVBoxLayout()
-        layout.addWidget(dial_time)
-        layout.addWidget(dial_voltage)
-        layout.addWidget(dial_trigger)
+        layout.addWidget(self.timeBox)
+        layout.addWidget(self.VoltageBox)
+        layout.addWidget(self.TriggerBox)
         layout.addStretch(1)
+
         self.topRightGroupBox.setLayout(layout)
 
     def createBottomLeftGroupBox(self):
         self.bottomLeftGroupBox = QGroupBox("Frequenzgenerator")
-        l1 = QLabel()
-        l1.setText("Amplitude")
-        l1.setAlignment(Qt.AlignRight)
+
+        self.lcd_amplitude = QLCDNumber()
+        self.lcd_amplitude.display(100)
+
+        self.lcd_frequenz = QLCDNumber()
+        self.lcd_frequenz.display(100)
+
+        amplitudebox = QGroupBox("Amplitude")
+        frequenzbox = QGroupBox("Frequenz")
         dial_amplitude = QDial()
         dial_amplitude.setValue(30)
         dial_amplitude.setNotchesVisible(True)
@@ -100,32 +150,54 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         dial_frequenz.setValue(30)
         dial_frequenz.setNotchesVisible(True)
 
-        layout = QVBoxLayout()
-        layout.addWidget(l1)
-        layout.addWidget(dial_amplitude)
-        layout.addWidget(dial_frequenz)
+        layoutamp = QHBoxLayout()
+        layoutamp.addWidget(dial_amplitude)
+        layoutamp.addWidget(self.lcd_amplitude)
+        layoutamp.addStretch(1)
+
+        layoutfre = QHBoxLayout()
+        layoutfre.addWidget(dial_frequenz)
+        layoutfre.addWidget(self.lcd_frequenz)
+        layoutfre.addStretch(1)
+
+        amplitudebox.setLayout(layoutamp)
+        frequenzbox.setLayout(layoutfre)
+
+
+        layout = QHBoxLayout()
+        layout.addWidget(amplitudebox)
+        layout.addWidget(frequenzbox)
+
         layout.addStretch(1)
+
         self.bottomLeftGroupBox.setLayout(layout)
+
 
     def createBottomRightGroupBox(self):
         self.bottomRightGroupBox = QGroupBox("Input Settings")
 
-        dial_time = QDial()
-        dial_time.setValue(30)
-        dial_time.setNotchesVisible(True)
-
-        dial_voltage = QDial()
-        dial_voltage.setValue(30)
-        dial_voltage.setNotchesVisible(True)
-
-        dial_trigger = QDial()
-        dial_trigger.setValue(30)
-        dial_trigger.setNotchesVisible(True)
-
+        self.label = QLabel('Woher soll das Signal bezogen werden ?')
+        self.rbtn1 = QRadioButton('Aus Datei lesen')
+        self.rbtn2 = QRadioButton('generiertes Signal')
+        self.rbtn3 = QRadioButton('Live Aufnahme')
+        self.freelabel = QLabel("")
+        self.label2 = QLabel('Soll das Signal invertiert werden?')
+        self.checkBoxinv = QCheckBox("Signal invertieren")
+        self.label3 = QLabel('Gerät für Live Aufnahme')
+        self.Inputdevicesbox = QComboBox()
+        self.Inputdevicesbox.addItems(["Audiokarte", "Mikrofon", "whatever"])
+        
         layout = QVBoxLayout()
-        layout.addWidget(dial_time)
-        layout.addWidget(dial_voltage)
-        layout.addWidget(dial_trigger)
+        layout.addWidget(self.label)
+        layout.addWidget(self.rbtn1)
+        layout.addWidget(self.rbtn2)
+        layout.addWidget(self.rbtn3)
+        layout.addWidget(self.freelabel)
+        layout.addWidget(self.label2)
+        layout.addWidget(self.checkBoxinv)
+        layout.addWidget(self.freelabel)
+        layout.addWidget(self.label3)
+        layout.addWidget(self.Inputdevicesbox)
         layout.addStretch(1)
         self.bottomRightGroupBox.setLayout(layout)
 
