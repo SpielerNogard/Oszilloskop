@@ -64,11 +64,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.lcd_time.display(100)
 
 
-        dial_time = QDial()
-        dial_time.setValue(30)
-        dial_time.setNotchesVisible(True)
+        self.dial_time = QDial()
+        self.dial_time.setValue(30)
+        self.dial_time.setNotchesVisible(True)
+        self.dial_time.valueChanged.connect(self.dial_time_changed)
 
-        layout.addWidget(dial_time)
+        layout.addWidget(self.dial_time)
         layout.addWidget(self.lcd_time)
         self.timeBox.setLayout(layout)
 
@@ -81,11 +82,11 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.lcd_voltage.display(100)
 
 
-        dial_voltage = QDial()
-        dial_voltage.setValue(30)
-        dial_voltage.setNotchesVisible(True)
-
-        layout.addWidget(dial_voltage)
+        self.dial_voltage = QDial()
+        self.dial_voltage.setValue(30)
+        self.dial_voltage.setNotchesVisible(True)
+        self.dial_voltage.valueChanged.connect(self.dial_voltage_changed)
+        layout.addWidget(self.dial_voltage)
         layout.addWidget(self.lcd_voltage)
         self.VoltageBox.setLayout(layout)
 
@@ -98,11 +99,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.lcd_trigger.display(100)
 
 
-        dial_trigger = QDial()
-        dial_trigger.setValue(30)
-        dial_trigger.setNotchesVisible(True)
+        self.dial_trigger = QDial()
+        self.dial_trigger.setValue(30)
+        self.dial_trigger.setNotchesVisible(True)
+        self.dial_trigger.valueChanged.connect(self.dial_trigger_changed)
 
-        layout.addWidget(dial_trigger)
+        layout.addWidget(self.dial_trigger)
         layout.addWidget(self.lcd_trigger)
         self.TriggerBox.setLayout(layout)
 
@@ -143,21 +145,23 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         amplitudebox = QGroupBox("Amplitude")
         frequenzbox = QGroupBox("Frequenz")
-        dial_amplitude = QDial()
-        dial_amplitude.setValue(30)
-        dial_amplitude.setNotchesVisible(True)
+        self.dial_amplitude = QDial()
+        self.dial_amplitude.setValue(30)
+        self.dial_amplitude.setNotchesVisible(True)
+        self.dial_amplitude.valueChanged.connect(self.dial_amplitude_changed)
 
-        dial_frequenz = QDial()
-        dial_frequenz.setValue(30)
-        dial_frequenz.setNotchesVisible(True)
+        self.dial_frequenz = QDial()
+        self.dial_frequenz.setValue(30)
+        self.dial_frequenz.setNotchesVisible(True)
+        self.dial_frequenz.valueChanged.connect(self.dial_frequenz_changed)
 
         layoutamp = QHBoxLayout()
-        layoutamp.addWidget(dial_amplitude)
+        layoutamp.addWidget(self.dial_amplitude)
         layoutamp.addWidget(self.lcd_amplitude)
         layoutamp.addStretch(1)
 
         layoutfre = QHBoxLayout()
-        layoutfre.addWidget(dial_frequenz)
+        layoutfre.addWidget(self.dial_frequenz)
         layoutfre.addWidget(self.lcd_frequenz)
         layoutfre.addStretch(1)
 
@@ -179,15 +183,25 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.label = QLabel('Woher soll das Signal bezogen werden ?')
         self.rbtn1 = QRadioButton('Aus Datei lesen')
+        self.rbtn1.toggled.connect(self.set_file_signal)
+
         self.rbtn2 = QRadioButton('generiertes Signal')
+        self.rbtn2.setChecked(True)
+        self.rbtn2.toggled.connect(self.set_generated_signal)
+
         self.rbtn3 = QRadioButton('Live Aufnahme')
+        self.rbtn3.toggled.connect(self.set_live_signal)
+
         self.freelabel = QLabel("")
         self.label2 = QLabel('Soll das Signal invertiert werden?')
         self.checkBoxinv = QCheckBox("Signal invertieren")
+        self.checkBoxinv.stateChanged.connect(self.check_inverted)
+
         self.label3 = QLabel('Gerät für Live Aufnahme')
         self.Inputdevicesbox = QComboBox()
         self.Inputdevicesbox.addItems(["Audiokarte", "Mikrofon", "whatever"])
-        
+        self.Inputdevicesbox.currentIndexChanged.connect(self.inputdevice_changed)
+
         layout = QVBoxLayout()
         layout.addWidget(self.label)
         layout.addWidget(self.rbtn1)
@@ -203,6 +217,49 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.bottomRightGroupBox.setLayout(layout)
 
 
+    def dial_time_changed(self):
+        getValue = self.dial_time.value()
+        self.lcd_time.display(getValue)
+    
+    def dial_voltage_changed(self):
+        getValue = self.dial_voltage.value()
+        self.lcd_voltage.display(getValue)
+
+    def dial_trigger_changed(self):
+        getValue = self.dial_trigger.value()
+        self.lcd_trigger.display(getValue)
+    
+    def dial_amplitude_changed(self):
+        getValue = self.dial_amplitude.value()
+        self.lcd_amplitude.display(getValue)
+
+    def dial_frequenz_changed(self):
+        getValue = self.dial_frequenz.value()
+        self.lcd_frequenz.display(getValue)
+
+    def set_generated_signal(self):
+        if self.rbtn2.isChecked():
+            print("Signal ist nun generiert")
+    
+    def set_file_signal(self):
+        if self.rbtn1.isChecked():
+            print("Signal ist nun file")
+    
+    def set_live_signal(self):
+        if self.rbtn3.isChecked():
+            print("Signal ist nun live")
+        
+    def check_inverted(self, state):
+        if state == QtCore.Qt.Checked:
+            print("Signal wird invertiert")
+        else:
+            print("Signal wird nicht mehr invertiert")
+
+    def inputdevice_changed(self,i):
+        print("Items in the list are :")
+        for count in range(self.Inputdevicesbox.count()):
+            print(self.Inputdevicesbox.itemText(count))
+        print("Current index",i,"selection changed ",self.Inputdevicesbox.currentText())
 
 if __name__ == "__main__":
     qapp = QtWidgets.QApplication(sys.argv)
