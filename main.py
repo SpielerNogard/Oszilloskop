@@ -202,6 +202,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.Inputdevicesbox.addItems(["Audiokarte", "Mikrofon", "whatever"])
         self.Inputdevicesbox.currentIndexChanged.connect(self.inputdevice_changed)
 
+        self.label4 = QLabel('Generierte Signalart:')
+        self.signaltypebox = QComboBox()
+        self.signaltypebox.addItems(["Sägezahn","Sägezahn","Sägezahn","Sägezahn","Sägezahn","Sägezahn","Sägezahn"])
+        self.signaltypebox.currentIndexChanged.connect(self.signaltype_changed)
+
+
         layout = QVBoxLayout()
         layout.addWidget(self.label)
         layout.addWidget(self.rbtn1)
@@ -213,6 +219,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         layout.addWidget(self.freelabel)
         layout.addWidget(self.label3)
         layout.addWidget(self.Inputdevicesbox)
+        layout.addWidget(self.label4)
+        layout.addWidget(self.signaltypebox)
         layout.addStretch(1)
         self.bottomRightGroupBox.setLayout(layout)
 
@@ -260,6 +268,12 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for count in range(self.Inputdevicesbox.count()):
             print(self.Inputdevicesbox.itemText(count))
         print("Current index",i,"selection changed ",self.Inputdevicesbox.currentText())
+
+    def signaltype_changed(self, i):
+        print("Items in the list are :")
+        for count in range(self.signaltypebox.count()):
+            print(self.signaltypebox.itemText(count))
+        print("Current index",i,"selection changed ",self.signaltypebox.currentText())
 
 if __name__ == "__main__":
     qapp = QtWidgets.QApplication(sys.argv)
