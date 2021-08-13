@@ -228,41 +228,49 @@ class ApplicationWindow(QtWidgets.QMainWindow):
     def dial_time_changed(self):
         getValue = self.dial_time.value()
         self.lcd_time.display(getValue)
+        self.myFig.set_time(getValue)
     
     def dial_voltage_changed(self):
         getValue = self.dial_voltage.value()
         self.lcd_voltage.display(getValue)
+        self.myFig.set_voltage(getValue)
 
     def dial_trigger_changed(self):
         getValue = self.dial_trigger.value()
         self.lcd_trigger.display(getValue)
-    
+        self.myFig.set_trigger(getValue)
+
     def dial_amplitude_changed(self):
         getValue = self.dial_amplitude.value()
         self.lcd_amplitude.display(getValue)
+        self.myFig.set_amplitude(getValue)
 
     def dial_frequenz_changed(self):
         getValue = self.dial_frequenz.value()
         self.lcd_frequenz.display(getValue)
+        self.myFig.set_frequenz(getValue)
 
     def set_generated_signal(self):
         if self.rbtn2.isChecked():
             print("Signal ist nun generiert")
-    
+            self.myFig.set_generated_signal()
     def set_file_signal(self):
         if self.rbtn1.isChecked():
             print("Signal ist nun file")
-    
+            self.myFig.set_file_signal()
     def set_live_signal(self):
         if self.rbtn3.isChecked():
             print("Signal ist nun live")
-        
+            self.myFig.set_live_signal()
+
     def check_inverted(self, state):
         if state == QtCore.Qt.Checked:
             print("Signal wird invertiert")
+            self.myFig.set_inverted(True)
         else:
             print("Signal wird nicht mehr invertiert")
-
+            self.myFig.set_inverted(False)
+            
     def inputdevice_changed(self,i):
         print("Items in the list are :")
         for count in range(self.Inputdevicesbox.count()):
