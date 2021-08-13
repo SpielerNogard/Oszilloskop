@@ -67,3 +67,31 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
             self.i = 0
         return self.d[self.i]
 
+    def set_time(self,time):
+        print(time)
+
+    def set_voltage(self,voltage):
+        print(voltage)
+
+    def set_trigger(self,trigger):
+        print(trigger)
+
+    def set_amplitude(self,amplitude):
+        print(amplitude)
+    
+    def set_frequenz(self,frequenz):
+        print(frequenz)
+    
+    def set_inverted(self,invertet):
+        print(invertet)
+
+    def set_generated_signal(self):
+        pass
+
+    def set_file_signal(self):
+        pass
+
+    def set_live_signal(self):
+        pass
+    
+    
