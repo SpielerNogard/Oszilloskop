@@ -31,7 +31,15 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         :param interval:    Get a new datapoint every .. milliseconds.
 
         '''
+        self.x = []
+        self.y = []
+        self.length = 10
+        self.triggered = False
+        self.trigger_value = 2
         self.inverted = False
+        for i in range (self.length):
+            self.x.append(i)
+            self.y.append(0)
 
 
         self.i = 0
@@ -44,16 +52,16 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self._y_range_ = y_range
 
         # Store two lists _x_ and _y_
-        x = list(range(0, x_len))
+        self.x = list(range(0, x_len))
         y = [0] * x_len
 
         # Store a figure and ax
         self._ax_ = self.figure.subplots()
         self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1])
-        self._line_, = self._ax_.plot(x, y)
+        self._line_, = self._ax_.plot(self.x, y)
 
         # Call superclass constructors
-        anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(y,), interval=interval, blit=True)
+        anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(y,), interval=interval, blit=False)
         return
 
     def _update_canvas_(self, i, y) -> None:
@@ -61,19 +69,29 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
-        y.append(round(self.get_next_datapoint(), 2))  # Add new datapoint
+        
+        y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
         y = y[-self._x_len_:]  # Truncate list _y_
-        self._line_.set_ydata(y)
-
+        #self._line_.set_ydata(y)
+        self._line_.set_data(self.x,y)
         return self._line_,
 
-    def get_next_datapoint(self):
-        self.i += 1
-        if self.i > 499:
-            self.i = 0
-        new_datapoint = self.d[self.i]
+    def give_me_new_poitn(self):
+        # Return your next y point 
+        self.i +=1
+        new_point = 3 * np.sin(2 * np.pi * self.i/60)
 
-        return self.d[self.i]
+        if self.inverted:
+            new_point = -new_point
+
+        if (self.inverted and new_point <-self.trigger_value) or (not self.inverted and new_point >self.trigger_value):
+            self.triggered = True
+        if not self.triggered:
+            new_point = 0
+
+            #self.y[self.t] = new_point
+
+        return(new_point)
 
     def set_time(self, time):
         print(time)
