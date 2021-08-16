@@ -17,6 +17,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
                              QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
                              QVBoxLayout, QWidget, QLCDNumber)
 
+from scipy import signal
 
 class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
     '''
@@ -52,14 +53,16 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self._y_range_ = y_range
 
         # Store two lists _x_ and _y_
-        self.x = list(range(0, x_len))
+        self.x = list(range(-10, x_len-10))
         y = [0] * x_len
 
         # Store a figure and ax
         self._ax_ = self.figure.subplots()
         self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1])
         self._line_, = self._ax_.plot(self.x, y)
-
+        self._ax_.grid()
+        self._ax_.axhline(y=0, color = "k")
+        self._ax_.axvline(x=0, color = "k")
         # Call superclass constructors
         anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(y,), interval=interval, blit=False)
         return
@@ -121,3 +124,35 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
     def set_live_signal(self):
         pass
 
+    
+    def generate_sinus(self,start,stop,sample_rate, samplerate,amplitude,frequency):
+        #Create TimeVector (Y)
+        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
+        #Create Sinus for every Step in TimeVector
+        Sinus = amplitude*np.sin(2*np.pi*frequency*t)
+
+        return(Sinus)
+
+    def generate_square(self,start,stop,sample_rate,Frequency):
+        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
+        Square = signal.square(2*np.pi*Frequency*t)
+        return(Square)
+
+    def generate_sawtooth(self,start,stop,sample_rate,Frequency):
+        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
+        Sawtooth = signal.sawtooth(2*np.pi*Frequency*t)
+        return(Sawtooth)
+
+    def generate_chirp(self,start,stop,sample_rate,Frequency):
+        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
+        Chirp = signal.chirp()
+
+    def generate_gauspulse(self,start,stop,sample_rate,Frequency,place):
+        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
+        real, imaginary, envelope = signal.gausspulse(t, fc = Frequency, retquad = True, retenv = True)
+
+    def generate_unitimpulse(self,start,stop,sample_rate,place):
+        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
+        lenght_impulse = len(t)
+        impulse = signal.unit_impulse(lenght_impulse,place)
+        return(impulse)
