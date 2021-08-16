@@ -43,18 +43,33 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.lyt = QGridLayout()
         self.frm.setLayout(self.lyt)
         self.setCentralWidget(self.frm)
+
         self.createTopLeftGroupBox()
         self.createTopRightGroupBox()
         self.createBottomLeftGroupBox()
         self.createBottomRightGroupBox()
+        self.create_Frequenzbox()
+
         self.lyt.addWidget(self.topLeftGroupBox, 1, 0)
-        self.lyt.addWidget(self.topRightGroupBox, 1, 1)
+        self.lyt.addWidget(self.freqbox, 1, 1)
         self.lyt.addWidget(self.bottomLeftGroupBox, 2, 0)
         self.lyt.addWidget(self.bottomRightGroupBox, 2, 1)
+        self.lyt.addWidget(self.topRightGroupBox, 1, 2)
         # 3. Show
         self.show()
         return
     
+    def create_Frequenzbox(self):
+        self.freqbox = QGroupBox("Frequenzanalyse")
+
+        # 2. Place the matplotlib figure
+        self.myFigfre = MyFigureCanvas(x_len=200, y_range=[0, 100], interval=20)
+        layout = QVBoxLayout()
+        self.myFigfre.setMinimumHeight(400)
+        layout.addWidget(self.myFigfre)
+        layout.addStretch(1)
+        self.freqbox.setLayout(layout)
+
     def createBoxtime(self):
         #Groupbox for Time Settings
         self.timeBox = QGroupBox("Zeit")
