@@ -18,6 +18,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
                              QVBoxLayout, QWidget, QLCDNumber)
 
 from scipy import signal
+from Signalgenerator import SignalGenerator
 
 class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
     '''
@@ -25,13 +26,17 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
     '''
 
-    def __init__(self, x_len: int, y_range: List, interval: int) -> None:
+    def __init__(self) -> None:
         '''
         :param x_len:       The nr of data points shown in one plot.
         :param y_range:     Range on y-axis.
         :param interval:    Get a new datapoint every .. milliseconds.
 
         '''
+        x_len=  200
+        y_range=  [0, 100]
+        interval= 20
+        self.Signal_gen = SignalGenerator()
         self.x = []
         self.y = []
         self.length = 10
@@ -44,8 +49,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
 
         self.i = 0
-        n = np.linspace(0, 499, 500)
-        self.d = 50 + 25 * (np.sin(n / 8.3)) + 10 * (np.sin(n / 7.5)) - 5 * (np.sin(n / 1.5))
+        
 
         FigureCanvas.__init__(self, mpl_fig.Figure())
         # Range settings
@@ -61,8 +65,8 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1])
         self._line_, = self._ax_.plot(self.x, y)
         self._ax_.grid()
-        self._ax_.axhline(y=0, color = "k")
-        self._ax_.axvline(x=0, color = "k")
+        #self._ax_.axhline(y=0, color = "k")
+        #self._ax_.axvline(x=0, color = "k")
         # Call superclass constructors
         anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(y,), interval=interval, blit=False)
         return
@@ -75,15 +79,20 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         
         y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
         y = y[-self._x_len_:]  # Truncate list _y_
+        #print(y)
         #self._line_.set_ydata(y)
         self._line_.set_data(self.x,y)
         return self._line_,
 
     def give_me_new_poitn(self):
-        # Return your next y point 
+        # Return your next y point
+        
         self.i +=1
-        new_point = 3 * np.sin(2 * np.pi * self.i/60)
-
+        #self.x.append(self.i) 
+        #new_point = 3 * np.sin(2 * np.pi * self.i/60)
+        #print(new_point)
+        new_point = self.Signal_gen.new_point(self.i)
+        #print(new_point)
         if self.inverted:
             new_point = -new_point
 
@@ -94,6 +103,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
             #self.y[self.t] = new_point
 
+        #print(new_point)
         return(new_point)
 
     def set_time(self, time):
@@ -125,34 +135,4 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         pass
 
     
-    def generate_sinus(self,start,stop,sample_rate, samplerate,amplitude,frequency):
-        #Create TimeVector (Y)
-        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        #Create Sinus for every Step in TimeVector
-        Sinus = amplitude*np.sin(2*np.pi*frequency*t)
-
-        return(Sinus)
-
-    def generate_square(self,start,stop,sample_rate,Frequency):
-        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        Square = signal.square(2*np.pi*Frequency*t)
-        return(Square)
-
-    def generate_sawtooth(self,start,stop,sample_rate,Frequency):
-        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        Sawtooth = signal.sawtooth(2*np.pi*Frequency*t)
-        return(Sawtooth)
-
-    def generate_chirp(self,start,stop,sample_rate,Frequency):
-        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        Chirp = signal.chirp()
-
-    def generate_gauspulse(self,start,stop,sample_rate,Frequency,place):
-        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        real, imaginary, envelope = signal.gausspulse(t, fc = Frequency, retquad = True, retenv = True)
-
-    def generate_unitimpulse(self,start,stop,sample_rate,place):
-        t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        lenght_impulse = len(t)
-        impulse = signal.unit_impulse(lenght_impulse,place)
-        return(impulse)
+    

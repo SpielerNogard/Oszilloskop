@@ -49,12 +49,14 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.createBottomLeftGroupBox()
         self.createBottomRightGroupBox()
         self.create_Frequenzbox()
+        self.create_bottonḾmost_right_box()
 
         self.lyt.addWidget(self.topLeftGroupBox, 1, 0)
         self.lyt.addWidget(self.freqbox, 1, 1)
         self.lyt.addWidget(self.bottomLeftGroupBox, 2, 0)
         self.lyt.addWidget(self.bottomRightGroupBox, 2, 1)
         self.lyt.addWidget(self.topRightGroupBox, 1, 2)
+        self.lyt.addWidget(self.graphpositionbox,2,2)
         # 3. Show
         self.show()
         return
@@ -63,7 +65,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.freqbox = QGroupBox("Frequenzanalyse")
 
         # 2. Place the matplotlib figure
-        self.myFigfre = MyFigureCanvas(x_len=200, y_range=[0, 100], interval=20)
+        self.myFigfre = MyFigureCanvas()
         layout = QVBoxLayout()
         self.myFigfre.setMinimumHeight(400)
         layout.addWidget(self.myFigfre)
@@ -127,7 +129,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.topLeftGroupBox = QGroupBox("Graph")
 
         # 2. Place the matplotlib figure
-        self.myFig = MyFigureCanvas(x_len=200, y_range=[0, 100], interval=20)
+        self.myFig = MyFigureCanvas()
         layout = QVBoxLayout()
         self.myFig.setMinimumHeight(400)
         layout.addWidget(self.myFig)
@@ -148,6 +150,49 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         layout.addStretch(1)
 
         self.topRightGroupBox.setLayout(layout)
+
+    def create_bottonḾmost_right_box(self):
+        self.graphpositionbox = QGroupBox("GraphPositionnierung")
+
+        self.lcd_posx = QLCDNumber()
+        self.lcd_posx.display(100)
+
+        self.lcd_posy = QLCDNumber()
+        self.lcd_posy.display(100)
+
+        x_box = QGroupBox("X Position")
+        y_box = QGroupBox("Y Position")
+        self.dial_pos_x = QDial()
+        self.dial_pos_x.setValue(30)
+        self.dial_pos_x.setNotchesVisible(True)
+        self.dial_pos_x.valueChanged.connect(self.dial_amplitude_changed)
+
+        self.dial_pos_y = QDial()
+        self.dial_pos_y.setValue(30)
+        self.dial_pos_y.setNotchesVisible(True)
+        self.dial_pos_y.valueChanged.connect(self.dial_frequenz_changed)
+
+        layoutx= QHBoxLayout()
+        layoutx.addWidget(self.dial_pos_x)
+        layoutx.addWidget(self.lcd_posx)
+        layoutx.addStretch(1)
+
+        layouty = QHBoxLayout()
+        layouty.addWidget(self.dial_pos_y)
+        layouty.addWidget(self.lcd_posy)
+        layouty.addStretch(1)
+
+        x_box.setLayout(layoutx)
+        y_box.setLayout(layouty)
+
+
+        layout = QHBoxLayout()
+        layout.addWidget(x_box)
+        layout.addWidget(y_box)
+
+        layout.addStretch(1)
+
+        self.graphpositionbox.setLayout(layout)
 
     def createBottomLeftGroupBox(self):
         self.bottomLeftGroupBox = QGroupBox("Frequenzgenerator")
