@@ -24,13 +24,16 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
 
     '''
 
-    def __init__(self, x_len: int, y_range: List, interval: int) -> None:
+    def __init__(self) -> None:
         '''
         :param x_len:       The nr of data points shown in one plot.
         :param y_range:     Range on y-axis.
         :param interval:    Get a new datapoint every .. milliseconds.
 
         '''
+        x_len=  200
+        y_range=  [0, 100]
+        interval= 20
         self.x = []
         self.y = []
         self.length = 10

@@ -28,6 +28,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
         QVBoxLayout, QWidget,QLCDNumber)
 
 from FigureCanvas import MyFigureCanvas
+from Frequenzanalyse import Frequenzcanvas
 class ApplicationWindow(QtWidgets.QMainWindow):
     '''
     The PyQt5 main window.
@@ -47,18 +48,20 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.createTopLeftGroupBox()
         self.createTopRightGroupBox()
         self.createBottomLeftGroupBox()
-        self.createBottomRightGroupBox()
-        self.create_Frequenzbox()
         self.create_bottonḾmost_right_box()
 
         self.lyt.addWidget(self.topLeftGroupBox, 1, 0)
-        self.lyt.addWidget(self.freqbox, 1, 1)
         self.lyt.addWidget(self.bottomLeftGroupBox, 2, 0)
-        self.lyt.addWidget(self.bottomRightGroupBox, 2, 1)
-        self.lyt.addWidget(self.topRightGroupBox, 1, 2)
-        self.lyt.addWidget(self.graphpositionbox,2,2)
+        self.lyt.addWidget(self.topRightGroupBox, 1, 1)
+        self.lyt.addWidget(self.graphpositionbox,2,1)
         # 3. Show
+        self.new_windw = FrequenzWindow()
+        self.new_windw.show()
+
+        self.settings = Settingswindow()
+        self.settings.show()
         self.show()
+        
         return
     
     def create_Frequenzbox(self):
@@ -238,6 +241,47 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.bottomLeftGroupBox.setLayout(layout)
 
 
+    
+    def dial_time_changed(self):
+        getValue = self.dial_time.value()
+        self.lcd_time.display(getValue)
+        self.myFig.set_time(getValue)
+    
+    def dial_voltage_changed(self):
+        getValue = self.dial_voltage.value()
+        self.lcd_voltage.display(getValue)
+        self.myFig.set_voltage(getValue)
+
+    def dial_trigger_changed(self):
+        getValue = self.dial_trigger.value()
+        self.lcd_trigger.display(getValue)
+        self.myFig.set_trigger(getValue)
+
+    def dial_amplitude_changed(self):
+        getValue = self.dial_amplitude.value()
+        self.lcd_amplitude.display(getValue)
+        self.myFig.set_amplitude(getValue)
+
+    def dial_frequenz_changed(self):
+        getValue = self.dial_frequenz.value()
+        self.lcd_frequenz.display(getValue)
+        self.myFig.set_frequenz(getValue)
+
+    
+
+class Settingswindow(QWidget):
+    """
+    This "window" is a QWidget. If it has no parent, it
+    will appear as a free-floating window as we want.
+    """
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Settings")
+        self.lyt = QGridLayout()
+        self.createBottomRightGroupBox()
+        self.lyt.addWidget(self.bottomRightGroupBox, 1, 0)
+        self.setLayout(self.lyt)
+
     def createBottomRightGroupBox(self):
         self.bottomRightGroupBox = QGroupBox("Input Settings")
 
@@ -284,32 +328,6 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         layout.addStretch(1)
         self.bottomRightGroupBox.setLayout(layout)
 
-
-    def dial_time_changed(self):
-        getValue = self.dial_time.value()
-        self.lcd_time.display(getValue)
-        self.myFig.set_time(getValue)
-    
-    def dial_voltage_changed(self):
-        getValue = self.dial_voltage.value()
-        self.lcd_voltage.display(getValue)
-        self.myFig.set_voltage(getValue)
-
-    def dial_trigger_changed(self):
-        getValue = self.dial_trigger.value()
-        self.lcd_trigger.display(getValue)
-        self.myFig.set_trigger(getValue)
-
-    def dial_amplitude_changed(self):
-        getValue = self.dial_amplitude.value()
-        self.lcd_amplitude.display(getValue)
-        self.myFig.set_amplitude(getValue)
-
-    def dial_frequenz_changed(self):
-        getValue = self.dial_frequenz.value()
-        self.lcd_frequenz.display(getValue)
-        self.myFig.set_frequenz(getValue)
-
     def set_generated_signal(self):
         if self.rbtn2.isChecked():
             print("Signal ist nun generiert")
@@ -342,6 +360,92 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         for count in range(self.signaltypebox.count()):
             print(self.signaltypebox.itemText(count))
         print("Current index",i,"selection changed ",self.signaltypebox.currentText())
+
+
+class FrequenzWindow(QWidget):
+    """
+    This "window" is a QWidget. If it has no parent, it
+    will appear as a free-floating window as we want.
+    """
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Frequenzanalyse")
+        self.lyt = QGridLayout()
+        self.create_Frequenzbox()
+        self.createFreqSettings()
+        self.lyt.addWidget(self.freqbox, 1, 0)
+        self.lyt.addWidget(self.topRightGroupBox, 1, 1)
+        self.setLayout(self.lyt)
+        #self.show()
+
+    def create_Frequenzbox(self):
+        self.freqbox = QGroupBox("Frequenzanalyse")
+
+        # 2. Place the matplotlib figure
+        self.myFigfre = Frequenzcanvas()
+        layout = QVBoxLayout()
+        self.myFigfre.setMinimumHeight(400)
+        layout.addWidget(self.myFigfre)
+        layout.addStretch(1)
+        self.freqbox.setLayout(layout)
+
+    def createFreqSettings(self):
+        self.createBoxfreqstart()
+        self.createBoxfreqstop()
+
+        self.topRightGroupBox = QGroupBox("Einstellungen")
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.boxfreqstart)
+        layout.addWidget(self.boxfreqstop)
+        layout.addStretch(1)
+
+        self.topRightGroupBox.setLayout(layout)
+
+    def createBoxfreqstart(self):
+        #Groupbox for Time Settings
+        self.boxfreqstart = QGroupBox("Frequenz Start")
+        layout = QHBoxLayout()
+
+        self.lcd_start = QLCDNumber()
+        self.lcd_start.display(100)
+
+
+        self.dial_start = QDial()
+        self.dial_start.setValue(30)
+        self.dial_start.setNotchesVisible(True)
+        self.dial_start.valueChanged.connect(self.dial_start_changed)
+
+        layout.addWidget(self.dial_start)
+        layout.addWidget(self.lcd_start)
+        self.boxfreqstart.setLayout(layout) 
+
+    def createBoxfreqstop(self):
+        #Groupbox for Time Settings
+        self.boxfreqstop = QGroupBox("Frequenz Stop")
+        layout = QHBoxLayout()
+
+        self.lcd_stop = QLCDNumber()
+        self.lcd_stop.display(100)
+
+
+        self.dial_stop = QDial()
+        self.dial_stop.setValue(30)
+        self.dial_stop.setNotchesVisible(True)
+        self.dial_stop.valueChanged.connect(self.dial_stop_changed)
+
+        layout.addWidget(self.dial_stop)
+        layout.addWidget(self.lcd_stop)
+        self.boxfreqstop.setLayout(layout) 
+
+    def dial_start_changed(self):
+        getValue = self.dial_start.value()
+        self.lcd_start.display(getValue)
+    
+    def dial_stop_changed(self):
+        getValue = self.dial_stop.value()
+        self.lcd_stop.display(getValue)
+        
 
 if __name__ == "__main__":
     qapp = QtWidgets.QApplication(sys.argv)
