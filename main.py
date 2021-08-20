@@ -60,6 +60,8 @@ class ApplicationWindow(QtWidgets.QMainWindow):
 
         self.settings = Settingswindow()
         self.settings.show()
+
+        
         self.show()
         
         return

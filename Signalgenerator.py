@@ -9,7 +9,7 @@ class SignalGenerator(object):
         self.frequency = 50
         self.amplitude = 3
 
-        self.signal_to_generate = "Sawtooth"
+        self.signal_to_generate = "Square"
         self.time_vector = None
         self.Signal = None
         #self.generate_time_vector()

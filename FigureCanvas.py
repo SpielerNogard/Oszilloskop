@@ -34,7 +34,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
         '''
         x_len=  200
-        y_range=  [0, 100]
+        y_range=  [-10, 10]
         interval= 20
         self.Signal_gen = SignalGenerator()
         self.x = []
