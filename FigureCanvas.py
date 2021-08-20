@@ -118,9 +118,11 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
     def set_amplitude(self, amplitude):
         print(amplitude)
+        self.Signal_gen.amplitude = int(amplitude)
 
     def set_frequenz(self, frequenz):
         print(frequenz)
+        self.Signal_gen.frequency = int(frequenz)
 
     def set_inverted(self, invertet):
         self.inverted = invertet
