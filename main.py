@@ -1,13 +1,3 @@
-#####################################################################################
-#                                                                                   #
-#                PLOT A LIVE GRAPH IN A PYQT WINDOW                                 #
-#                EXAMPLE 2                                                          #
-#               ------------------------------------                                #
-# This code is inspired on:                                                         #
-# https://learn.sparkfun.com/tutorials/graph-sensor-data-with-python-and-matplotlib/speeding-up-the-plot-animation  #
-#                                                                                   #
-#####################################################################################
-
 from __future__ import annotations
 from typing import *
 import sys
@@ -29,6 +19,8 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
 
 from FigureCanvas import MyFigureCanvas
 from Frequenzanalyse import Frequenzcanvas
+
+
 class ApplicationWindow(QtWidgets.QMainWindow):
     '''
     The PyQt5 main window.
@@ -61,7 +53,7 @@ class ApplicationWindow(QtWidgets.QMainWindow):
         self.settings = Settingswindow()
         self.settings.show()
 
-        
+
         self.show()
         
         return
@@ -310,7 +302,7 @@ class Settingswindow(QWidget):
 
         self.label4 = QLabel('Generierte Signalart:')
         self.signaltypebox = QComboBox()
-        self.signaltypebox.addItems(["Sägezahn","Sägezahn","Sägezahn","Sägezahn","Sägezahn","Sägezahn","Sägezahn"])
+        self.signaltypebox.addItems(["Sinus","Sawtooth","Square"])
         self.signaltypebox.currentIndexChanged.connect(self.signaltype_changed)
 
 

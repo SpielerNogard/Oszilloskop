@@ -26,7 +26,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
     '''
 
-    def __init__(self) -> None:
+    def __init__(self,Signalgenerator) -> None:
         '''
         :param x_len:       The nr of data points shown in one plot.
         :param y_range:     Range on y-axis.
@@ -36,7 +36,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         x_len=  200
         y_range=  [-10, 10]
         interval= 20
-        self.Signal_gen = SignalGenerator()
+        self.Signal_gen = Signalgenerator
         self.x = []
         self.y = []
         self.length = 10
@@ -134,5 +134,10 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
     def set_live_signal(self):
         pass
 
+    def set_posx(self,value):
+        pass
+
+    def set_posy(self, value):
+        pass
     
     
