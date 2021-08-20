@@ -42,8 +42,7 @@ class Settingswindow(QWidget):
         self.rbtn2.setChecked(True)
         self.rbtn2.toggled.connect(self.set_generated_signal)
 
-        self.rbtn3 = QRadioButton('Live Aufnahme')
-        self.rbtn3.toggled.connect(self.set_live_signal)
+        
 
         self.freelabel = QLabel("")
         self.label2 = QLabel('Soll das Signal invertiert werden?')
@@ -65,7 +64,6 @@ class Settingswindow(QWidget):
         layout.addWidget(self.label)
         layout.addWidget(self.rbtn1)
         layout.addWidget(self.rbtn2)
-        layout.addWidget(self.rbtn3)
         layout.addWidget(self.freelabel)
         layout.addWidget(self.label2)
         layout.addWidget(self.checkBoxinv)
@@ -85,11 +83,7 @@ class Settingswindow(QWidget):
         if self.rbtn1.isChecked():
             print("Signal ist nun file")
             self.myFig.set_file_signal()
-    def set_live_signal(self):
-        if self.rbtn3.isChecked():
-            print("Signal ist nun live")
-            self.myFig.set_live_signal()
-
+    
     def check_inverted(self, state):
         if state == QtCore.Qt.Checked:
             print("Signal wird invertiert")
