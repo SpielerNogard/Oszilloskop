@@ -31,7 +31,8 @@ class Oszilloskop(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.SignalGenerator = SignalGenerator()
-        self.settings = Settingswindow(self.SignalGenerator)
+        self.myFig = MyFigureCanvas(self.SignalGenerator)
+        self.settings = Settingswindow(self.SignalGenerator,self.myFig)
         self.FreqWindow = FrequenzWindow()
         
         self.window_settings()
@@ -102,7 +103,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.topLeftGroupBox = QGroupBox("Graph")
 
         # 2. Place the matplotlib figure
-        self.myFig = MyFigureCanvas(self.SignalGenerator)
+        
         layout = QVBoxLayout()
         self.myFig.setMinimumHeight(400)
         layout.addWidget(self.myFig)

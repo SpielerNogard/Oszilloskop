@@ -22,8 +22,9 @@ class Settingswindow(QWidget):
     This "window" is a QWidget. If it has no parent, it
     will appear as a free-floating window as we want.
     """
-    def __init__(self,Signalgenerator):
+    def __init__(self,Signalgenerator,fig):
         super().__init__()
+        self.myFig = fig
         self.setWindowTitle("Settings")
         self.lyt = QGridLayout()
         self.createBottomRightGroupBox()
