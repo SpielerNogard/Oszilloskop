@@ -27,13 +27,15 @@ from PyQt5.QtGui import QIcon
 
 from Settings import Settingswindow
 from FrequenzWindow import FrequenzWindow
+from Frequenzanalyse import Frequenzcanvas
 class Oszilloskop(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.SignalGenerator = SignalGenerator()
         self.myFig = MyFigureCanvas(self.SignalGenerator)
+        self.myFigfre = Frequenzcanvas()
         self.settings = Settingswindow(self.SignalGenerator,self.myFig)
-        self.FreqWindow = FrequenzWindow()
+        self.FreqWindow = FrequenzWindow(self.myFigfre,self.myFig)
         
         self.window_settings()
         self.add_windows()

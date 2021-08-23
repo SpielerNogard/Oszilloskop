@@ -25,8 +25,10 @@ class FrequenzWindow(QWidget):
     This "window" is a QWidget. If it has no parent, it
     will appear as a free-floating window as we want.
     """
-    def __init__(self):
+    def __init__(self,myfig,real_my_fig):
         super().__init__()
+        self.mygraph = real_my_fig
+        self.myFigfre = myfig
         self.setWindowTitle("Frequenzanalyse")
         self.lyt = QGridLayout()
         self.create_Frequenzbox()
@@ -40,7 +42,7 @@ class FrequenzWindow(QWidget):
         self.freqbox = QGroupBox("Frequenzanalyse")
 
         # 2. Place the matplotlib figure
-        self.myFigfre = Frequenzcanvas()
+        
         layout = QVBoxLayout()
         self.myFigfre.setMinimumHeight(400)
         layout.addWidget(self.myFigfre)
