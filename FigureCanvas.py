@@ -33,9 +33,16 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         :param interval:    Get a new datapoint every .. milliseconds.
 
         '''
+        self.max_amount_values_saved = 100000
+        self.x_offset = 1
+
         x_len=  200
         y_range=  [-10, 10]
+        self.offset = 0
         interval= 20
+
+
+
         self.Signal_gen = Signalgenerator
         self.x = []
         self.y = []
@@ -54,15 +61,16 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         FigureCanvas.__init__(self, mpl_fig.Figure())
         # Range settings
         self._x_len_ = x_len
-        self._y_range_ = y_range
+        self._y_range_ = 10
 
         # Store two lists _x_ and _y_
         self.x = list(range(-10, x_len-10))
         y = [0] * x_len
-
+        self.saved_y = [0] * x_len
+        self.index = 0
         # Store a figure and ax
         self._ax_ = self.figure.subplots()
-        self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1])
+        self._ax_.set_ylim(ymin=-self._y_range_, ymax=self._y_range_)
         self._line_, = self._ax_.plot(self.x, y)
         self._ax_.grid()
         #self._ax_.axhline(y=0, color = "k")
@@ -76,12 +84,24 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
-        
-        y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
-        y = y[-self._x_len_:]  # Truncate list _y_
+
+        new_point = round(self.give_me_new_poitn(), 2)
+
+        self.saved_y.append(new_point)
+
+        if len(self.saved_y) > self.max_amount_values_saved:
+            self.saved_y.pop(0)
+
+        x_offset = round((len(self.saved_y) - self._x_len_) * self.x_offset)
+
+        show_y = self.saved_y[x_offset:x_offset + self._x_len_]
+
+        #y.append(new_point)  # Add new datapoint
+       # y = y[-self._x_len_:]  # Truncate list _y_
         #print(y)
         #self._line_.set_ydata(y)
-        self._line_.set_data(self.x,y)
+        self._line_.set_data(self.x, show_y)
+
         return self._line_,
 
     def give_me_new_poitn(self):
@@ -107,11 +127,15 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         return(new_point)
 
     def set_time(self, time):
-        print(time)
+        #self.x_offset = (time+1) * 0.01
+        #self._x_len_ = time
+        #self.x = list(range(-10, time - 10))
+        self._ax_.set_xlim(xmin=-10, xmax=time)
 
     def set_voltage(self, voltage):
-        self._ax_.set_ylim(ymin= - voltage, ymax=voltage)
         self._y_range_ = voltage
+        self._ax_.set_ylim(ymin=(-self._y_range_ + self.offset), ymax=(self._y_range_ + self.offset))
+
 
     def set_trigger(self, trigger):
         print(trigger)
@@ -125,6 +149,8 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.Signal_gen.frequency = int(frequenz)
 
     def set_inverted(self, invertet):
+        for i in range(len(self.saved_y)):
+            self.saved_y[i] = -self.saved_y[i]
         self.inverted = invertet
 
     def set_generated_signal(self):
@@ -137,9 +163,13 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         pass
 
     def set_posx(self,value):
-        pass
+        self.x_offset = (time+1) * 0.01
+
 
     def set_posy(self, value):
-        pass
+        self.offset = (value - 50) * 2
+        self.offset = self.offset * self._y_range_ * 0.01
+
+        self._ax_.set_ylim(ymin=(-self._y_range_ + self.offset), ymax=(self._y_range_ + self.offset))
     
     

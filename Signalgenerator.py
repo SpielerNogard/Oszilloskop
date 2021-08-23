@@ -5,7 +5,7 @@ class SignalGenerator(object):
     def __init__(self):
         self.start = 0
         self.stop = 100
-        self.sample_rate = 480000
+        self.sample_rate = 4800
         self.frequency =50
         self.amplitude = 3
 
@@ -32,13 +32,13 @@ class SignalGenerator(object):
 
     def generate_sinus(self):
         #Sinus = self.amplitude*np.sin(2*np.pi*self.frequency*self.time_vector)
-        Sinus = self.amplitude*np.sin(2*np.pi* self.i/self.frequency)
+        Sinus = self.amplitude*np.sin(2*np.pi* self.frequency * self.i/self.sample_rate)
         self.Signal = Sinus
         return(Sinus)
 
     def generate_square(self):
         #Square = signal.square(2*np.pi*self.frequency*self.time_vector)
-        Square = self.amplitude*signal.square(2*np.pi* self.i/self.frequency)
+        Square = self.amplitude*signal.square(2*np.pi* self.frequency * self.i/self.sample_rate)
         
         self.Signal = Square
         return(Square)
@@ -46,7 +46,7 @@ class SignalGenerator(object):
     def generate_sawtooth(self):
         #t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
         #Sawtooth = signal.sawtooth(2*np.pi*Frequency*t)
-        Sawtooth = self.amplitude*signal.sawtooth(2*np.pi* self.i/self.frequency)
+        Sawtooth = self.amplitude*signal.sawtooth(2*np.pi* self.frequency * self.i/self.sample_rate)
         self.Signal = Sawtooth
         return(Sawtooth)
 

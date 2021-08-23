@@ -16,7 +16,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
                              QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
                              QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
                              QVBoxLayout, QWidget, QLCDNumber)
-
+from scipy.fft import fft, fftfreq
 
 class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
     '''
@@ -31,7 +31,7 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         :param interval:    Get a new datapoint every .. milliseconds.
 
         '''
-        x_len=  200
+        x_len=  50
         y_range=  [0, 100]
         interval= 20
         self.x = []
@@ -60,7 +60,7 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
 
         # Store a figure and ax
         self._ax_ = self.figure.subplots()
-        self._ax_.set_ylim(ymin=self._y_range_[0], ymax=self._y_range_[1])
+        self._ax_.set_ylim(ymin=0, ymax=5)
         self._line_, = self._ax_.plot(self.x, y)
 
         # Call superclass constructors
@@ -72,11 +72,25 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
-        
         y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
         y = y[-self._x_len_:]  # Truncate list _y_
+
+        # Number of sample points
+
+        N = len(self.x)
+
+        # sample spacing
+
+        T = 1.0 / 2500
+
+        yf = fft(y)
+
+        xf = fftfreq(N, T)[:N // 2]
+        self._ax_.set_xlim(xmin=30, xmax=70)
+
+        #self._ax_.set_xlim(xmin=30, xmax=70)
         #self._line_.set_ydata(y)
-        self._line_.set_data(self.x,y)
+        self._line_.set_data(xf, 2.0 / N * np.abs(yf[0:N // 2]))
         return self._line_,
 
     def give_me_new_poitn(self):
