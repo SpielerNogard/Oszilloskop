@@ -5,8 +5,8 @@ class SignalGenerator(object):
     def __init__(self):
         self.start = 0
         self.stop = 100
-        self.sample_rate = 4800
-        self.frequency =50
+        self.sample_rate = 50000
+        self.frequency =200
         self.amplitude = 3
 
         self.signal_to_generate = "Sinus"

@@ -40,7 +40,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         y_range=  [-10, 10]
         self.offset = 0
         interval= 20
-
+        self.abtastrate = 44100
 
 
         self.Signal_gen = Signalgenerator
@@ -84,16 +84,21 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
+        #self.triggered = False
+        amount = round(self.abtastrate * self._interval / 1000)
+        for i in range(1):
+            new_point = round(self.give_me_new_poitn(), 2)
+            #if (self.inverted and new_point < -self.trigger_value) or (not self.inverted and new_point > self.trigger_value):
+           #     self.triggered = True
+            #if not self.triggered:
+                #continue
 
-        new_point = round(self.give_me_new_poitn(), 2)
 
-        self.saved_y.append(new_point)
-
-        if len(self.saved_y) > self.max_amount_values_saved:
-            self.saved_y.pop(0)
+            self.saved_y.append(new_point)
+            if len(self.saved_y) > self.max_amount_values_saved:
+                self.saved_y.pop(0)
 
         x_offset = round((len(self.saved_y) - self._x_len_) * self.x_offset)
-
         show_y = self.saved_y[x_offset:x_offset + self._x_len_]
 
         #y.append(new_point)  # Add new datapoint
@@ -130,7 +135,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         #self.x_offset = (time+1) * 0.01
         #self._x_len_ = time
         #self.x = list(range(-10, time - 10))
-        self._ax_.set_xlim(xmin=-10, xmax=time)
+        self._ax_.set_xlim(xmin=-10, xmax=time*100)
 
     def set_voltage(self, voltage):
         self._y_range_ = voltage
@@ -138,7 +143,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
 
     def set_trigger(self, trigger):
-        print(trigger)
+        self.trigger_value = trigger
 
     def set_amplitude(self, amplitude):
         print(amplitude)
@@ -163,7 +168,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         pass
 
     def set_posx(self,value):
-        self.x_offset = (time+1) * 0.01
+        self.x_offset = (value+1) * 0.01
 
 
     def set_posy(self, value):

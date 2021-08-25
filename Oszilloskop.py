@@ -33,7 +33,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         super().__init__()
         self.SignalGenerator = SignalGenerator()
         self.myFig = MyFigureCanvas(self.SignalGenerator)
-        self.myFigfre = Frequenzcanvas()
+        self.myFigfre = Frequenzcanvas(self.myFig)
         self.settings = Settingswindow(self.SignalGenerator,self.myFig)
         self.FreqWindow = FrequenzWindow(self.myFigfre,self.myFig)
         

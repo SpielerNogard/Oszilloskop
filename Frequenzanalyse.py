@@ -24,16 +24,18 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
 
     '''
 
-    def __init__(self) -> None:
+    def __init__(self,myFig) -> None:
         '''
         :param x_len:       The nr of data points shown in one plot.
         :param y_range:     Range on y-axis.
         :param interval:    Get a new datapoint every .. milliseconds.
 
         '''
-        x_len=  50
+
+        self.myFig = myFig
+        x_len =  2000
         y_range=  [0, 100]
-        interval= 20
+        interval= 2
         self.x = []
         self.y = []
         self.length = 10
@@ -72,6 +74,7 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
+        print(self.myFig.saved_y[-1])
         y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
         y = y[-self._x_len_:]  # Truncate list _y_
 
@@ -81,23 +84,23 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
 
         # sample spacing
 
-        T = 1.0 / 2500
+        T = self._interval / 1000
 
-        yf = fft(y)
+        yf = fft(y)[0:N // 2]
 
         xf = fftfreq(N, T)[:N // 2]
-        self._ax_.set_xlim(xmin=30, xmax=70)
+        #print (y)
+        self._ax_.set_xlim(xmin=xf[0], xmax=xf[-1])
 
         #self._ax_.set_xlim(xmin=30, xmax=70)
         #self._line_.set_ydata(y)
-        self._line_.set_data(xf, 2.0 / N * np.abs(yf[0:N // 2]))
+        self._line_.set_data(xf, 2.0 / N * np.abs(yf))
         return self._line_,
 
     def give_me_new_poitn(self):
-        # Return your next y point 
+        # Return your next y point
         self.i +=1
-        new_point = 3 * np.sin(2 * np.pi * self.i/60)
-
+        new_point = 3 * np.sin(2 * np.pi * 70 * self.i * self._interval / 1000)
         if self.inverted:
             new_point = -new_point
 
