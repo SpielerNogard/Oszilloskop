@@ -28,6 +28,7 @@ from PyQt5.QtGui import QIcon
 from Settings import Settingswindow
 from FrequenzWindow import FrequenzWindow
 from Frequenzanalyse import Frequenzcanvas
+import math
 class Oszilloskop(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
@@ -36,7 +37,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.myFigfre = Frequenzcanvas(self.myFig)
         self.settings = Settingswindow(self.SignalGenerator,self.myFig)
         self.FreqWindow = FrequenzWindow(self.myFigfre,self.myFig)
-        
+        self.create_labels()
         self.window_settings()
         self.add_windows()
         self.add_functions()
@@ -112,17 +113,39 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout.addStretch(1)
         self.topLeftGroupBox.setLayout(layout)
 
+    def create_labels(self):
+        self.label_amp = QLabel()
+        self.label_amp.setText("V")
+
+        self.label_frequenzg = QLabel()
+        self.label_frequenzg.setText("Hz")
+
+        self.label_time = QLabel()
+        self.label_time.setText("s")
+
+        self.label_voltage = QLabel()
+        self.label_voltage.setText("V")
+
+        self.label_trigger = QLabel()
+        self.label_trigger.setText("V")
+        
+        self.label_posx = QLabel()
+        self.label_posx.setText("%")
+
+        self.label_posy = QLabel()
+        self.label_posy.setText("%")
     def createBottomLeftGroupBox(self):
         self.bottomLeftGroupBox = QGroupBox("Frequenzgenerator")
 
         self.lcd_amplitude = QLCDNumber()
         self.lcd_amplitude.display(100)
-
+        
         self.lcd_frequenz = QLCDNumber()
         self.lcd_frequenz.display(100)
 
         amplitudebox = QGroupBox("Amplitude")
         frequenzbox = QGroupBox("Frequenz")
+
         self.dial_amplitude = QDial()
         self.dial_amplitude.setValue(30)
         self.dial_amplitude.setNotchesVisible(True)
@@ -136,11 +159,14 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layoutamp = QHBoxLayout()
         layoutamp.addWidget(self.dial_amplitude)
         layoutamp.addWidget(self.lcd_amplitude)
+        layoutamp.addWidget(self.label_amp)
+        #layoutamp.addWidget(vbox)
         layoutamp.addStretch(1)
 
         layoutfre = QHBoxLayout()
         layoutfre.addWidget(self.dial_frequenz)
         layoutfre.addWidget(self.lcd_frequenz)
+        layoutfre.addWidget(self.label_frequenzg)
         layoutfre.addStretch(1)
 
         amplitudebox.setLayout(layoutamp)
@@ -186,6 +212,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
         layout.addWidget(self.dial_time)
         layout.addWidget(self.lcd_time)
+        layout.addWidget(self.label_time)
         self.timeBox.setLayout(layout)
 
     def createBoxVoltage(self):
@@ -203,6 +230,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         
         layout.addWidget(self.dial_voltage)
         layout.addWidget(self.lcd_voltage)
+        layout.addWidget(self.label_voltage)
         self.VoltageBox.setLayout(layout)
 
     def createBoxTrigger(self):
@@ -221,6 +249,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
         layout.addWidget(self.dial_trigger)
         layout.addWidget(self.lcd_trigger)
+        layout.addWidget(self.label_trigger)
         self.TriggerBox.setLayout(layout)
 
     def create_bottonḾmost_right_box(self):
@@ -247,11 +276,13 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layoutx= QHBoxLayout()
         layoutx.addWidget(self.dial_pos_x)
         layoutx.addWidget(self.lcd_posx)
+        layoutx.addWidget(self.label_posx)
         layoutx.addStretch(1)
 
         layouty = QHBoxLayout()
         layouty.addWidget(self.dial_pos_y)
         layouty.addWidget(self.lcd_posy)
+        layouty.addWidget(self.label_posy)
         layouty.addStretch(1)
 
         x_box.setLayout(layoutx)
@@ -268,8 +299,10 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
     def dial_time_changed(self):
         getValue = self.dial_time.value()
-        self.lcd_time.display(getValue)
-        self.myFig.set_time(getValue)
+        wert = self.give_me_exponential(getValue)
+
+        self.lcd_time.display(wert)
+        self.myFig.set_time(wert)
     
     def dial_voltage_changed(self):
         getValue = self.dial_voltage.value()
@@ -288,8 +321,10 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
     def dial_frequenz_changed(self):
         getValue = self.dial_frequenz.value()
-        self.lcd_frequenz.display(getValue)
-        self.myFig.set_frequenz(getValue)
+        wert = self.give_me_exponential(getValue)
+
+        self.lcd_frequenz.display(wert)
+        self.myFig.set_frequenz(wert)
 
     def dial_posx_changed(self):
         getValue = self.dial_pos_x.value()
@@ -301,6 +336,13 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.lcd_posy.display(getValue)
         self.myFig.set_posy(getValue)
 
+    def give_me_exponential(self,i):
+        wert = math.pow(2,i)
+        rounds = math.floor((i-2)/3)+1
+        for k in range(rounds):
+            wert = wert+math.pow(10,k)*math.pow(2,i-(2+3*k))
+
+        return(wert)
 if __name__ == "__main__":
     qapp = QtWidgets.QApplication(sys.argv)
     app = Oszilloskop()

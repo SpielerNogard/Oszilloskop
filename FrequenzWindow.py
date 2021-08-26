@@ -19,7 +19,7 @@ from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
 
 
 from Frequenzanalyse import Frequenzcanvas
-
+import math
 class FrequenzWindow(QWidget):
     """
     This "window" is a QWidget. If it has no parent, it
@@ -31,12 +31,20 @@ class FrequenzWindow(QWidget):
         self.myFigfre = myfig
         self.setWindowTitle("Frequenzanalyse")
         self.lyt = QGridLayout()
+        self.create_labels()
         self.create_Frequenzbox()
         self.createFreqSettings()
         self.lyt.addWidget(self.freqbox, 1, 0)
         self.lyt.addWidget(self.topRightGroupBox, 1, 1)
         self.setLayout(self.lyt)
         #self.show()
+
+    def create_labels(self):
+        self.label_freqstart = QLabel()
+        self.label_freqstart.setText("Hz")
+
+        self.label_freqstop = QLabel()
+        self.label_freqstop.setText("Hz")
 
     def create_Frequenzbox(self):
         self.freqbox = QGroupBox("Frequenzanalyse")
@@ -78,6 +86,7 @@ class FrequenzWindow(QWidget):
 
         layout.addWidget(self.dial_start)
         layout.addWidget(self.lcd_start)
+        layout.addWidget(self.label_freqstart)
         self.boxfreqstart.setLayout(layout) 
 
     def createBoxfreqstop(self):
@@ -96,12 +105,23 @@ class FrequenzWindow(QWidget):
 
         layout.addWidget(self.dial_stop)
         layout.addWidget(self.lcd_stop)
+        layout.addWidget(self.label_freqstop)
         self.boxfreqstop.setLayout(layout) 
 
     def dial_start_changed(self):
         getValue = self.dial_start.value()
-        self.lcd_start.display(getValue)
+        wert = self.give_me_exponential(getValue)
+        self.lcd_start.display(wert)
     
     def dial_stop_changed(self):
         getValue = self.dial_stop.value()
-        self.lcd_stop.display(getValue)
+        wert = self.give_me_exponential(getValue)
+        self.lcd_stop.display(wert)
+
+    def give_me_exponential(self,i):
+        wert = math.pow(2,i)
+        rounds = math.floor((i-2)/3)+1
+        for k in range(rounds):
+            wert = wert+math.pow(10,k)*math.pow(2,i-(2+3*k))
+
+        return(wert)

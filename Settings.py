@@ -32,6 +32,9 @@ class Settingswindow(QWidget):
         self.setLayout(self.lyt)
 
         self.Signalgenerator = Signalgenerator
+
+    
+
     def createBottomRightGroupBox(self):
         self.bottomRightGroupBox = QGroupBox("Input Settings")
 
@@ -63,14 +66,14 @@ class Settingswindow(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(self.label)
-        layout.addWidget(self.rbtn1)
+        #layout.addWidget(self.rbtn1)
         layout.addWidget(self.rbtn2)
         layout.addWidget(self.freelabel)
         layout.addWidget(self.label2)
         layout.addWidget(self.checkBoxinv)
         layout.addWidget(self.freelabel)
-        layout.addWidget(self.label3)
-        layout.addWidget(self.Inputdevicesbox)
+        #layout.addWidget(self.label3)
+        #layout.addWidget(self.Inputdevicesbox)
         layout.addWidget(self.label4)
         layout.addWidget(self.signaltypebox)
         layout.addStretch(1)
