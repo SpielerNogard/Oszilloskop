@@ -112,16 +112,19 @@ class FrequenzWindow(QWidget):
         getValue = self.dial_start.value()
         wert = self.give_me_exponential(getValue)
         self.lcd_start.display(wert)
+        self.myFigfre.set_start_frequenz(wert)
     
     def dial_stop_changed(self):
         getValue = self.dial_stop.value()
         wert = self.give_me_exponential(getValue)
         self.lcd_stop.display(wert)
+        self.myFigfre.set_stop_frequenz(wert)
 
     def give_me_exponential(self,i):
+        i = math.floor(i/5)
         wert = math.pow(2,i)
         rounds = math.floor((i-2)/3)+1
         for k in range(rounds):
             wert = wert+math.pow(10,k)*math.pow(2,i-(2+3*k))
 
-        return(wert)
+        return(wert * 0.1)

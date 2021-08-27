@@ -1,30 +1,13 @@
-import numpy as np
-from scipy.fft import fft, fftfreq
-
-# Number of sample points
-
-N = 600
-
-# sample spacing
-
-T = 1.0 / 800.0
-
-x = np.linspace(0.0, N*T, N, endpoint=False)
-y = []
-
-for i in range (len(x)):
-    y.append(np.sin(50.0 * 2.0*np.pi* i * T) + 0.5*np.sin(80.0 * 2.0*np.pi* i * T))
+import math
 
 
+wert = 1
 
-yf = fft(y)
+for i in range(100):
 
-xf = fftfreq(N, T)[:N//2]
+    wert = math.pow(2,i)
+    rounds = math.floor((i-2)/3) + 1
+    for k in range(rounds):
+        wert = wert + math.pow(10,k) * math.pow(2,i - (2 + 3*k))
 
-import matplotlib.pyplot as plt
-
-plt.plot(xf, 2.0/N * np.abs(yf[0:N//2]))
-
-plt.grid()
-
-plt.show()
+    print (wert)

@@ -299,7 +299,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
     def dial_time_changed(self):
         getValue = self.dial_time.value()
-        wert = self.give_me_exponential(getValue)
+        wert = self.give_me_exponential(getValue) *0.01
 
         self.lcd_time.display(wert)
         self.myFig.set_time(wert)
@@ -321,7 +321,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
     def dial_frequenz_changed(self):
         getValue = self.dial_frequenz.value()
-        wert = self.give_me_exponential(getValue)
+        wert = self.give_me_exponential(getValue) * 10
 
         self.lcd_frequenz.display(wert)
         self.myFig.set_frequenz(wert)
@@ -337,12 +337,13 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.myFig.set_posy(getValue)
 
     def give_me_exponential(self,i):
+        i = math.floor(i/5)
         wert = math.pow(2,i)
         rounds = math.floor((i-2)/3)+1
         for k in range(rounds):
             wert = wert+math.pow(10,k)*math.pow(2,i-(2+3*k))
 
-        return(wert)
+        return(wert * 0.001)
 if __name__ == "__main__":
     qapp = QtWidgets.QApplication(sys.argv)
     app = Oszilloskop()

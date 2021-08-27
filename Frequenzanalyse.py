@@ -35,13 +35,18 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         self.myFig = myFig
         x_len =  2000
         y_range=  [0, 100]
-        interval= 2
+        interval= 20
         self.x = []
         self.y = []
         self.length = 10
         self.triggered = False
         self.trigger_value = 2
         self.inverted = False
+
+        self.start_frequenz = 0
+        self.stop_frequenz = 1000
+
+
         for i in range (self.length):
             self.x.append(i)
             self.y.append(0)
@@ -74,28 +79,36 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
-        print(self.myFig.saved_y[-1])
-        y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
-        y = y[-self._x_len_:]  # Truncate list _y_
+        y = self.myFig.saved_y
+        x = self.myFig.x
+        #y.append(round(self.give_me_new_poitn(), 2))  # Add new datapoint
+        #y = y[-self._x_len_:]  # Truncate list _y_
 
         # Number of sample points
 
-        N = len(self.x)
+        N = len(x)
 
         # sample spacing
 
-        T = self._interval / 1000
+        T = 1/ self.myFig.abtastrate
 
         yf = fft(y)[0:N // 2]
 
         xf = fftfreq(N, T)[:N // 2]
         #print (y)
-        self._ax_.set_xlim(xmin=xf[0], xmax=xf[-1])
 
         #self._ax_.set_xlim(xmin=30, xmax=70)
         #self._line_.set_ydata(y)
         self._line_.set_data(xf, 2.0 / N * np.abs(yf))
         return self._line_,
+
+    def set_start_frequenz(self, frequenz):
+        self.start_frequenz = frequenz
+        self._ax_.set_xlim(xmin=self.start_frequenz, xmax=self.stop_frequenz)
+
+    def set_stop_frequenz(self, frequenz):
+        self.stop_frequenz = frequenz
+        self._ax_.set_xlim(xmin=self.start_frequenz, xmax=self.stop_frequenz)
 
     def give_me_new_poitn(self):
         # Return your next y point
