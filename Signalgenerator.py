@@ -4,27 +4,19 @@ from scipy import signal
 
 class SignalGenerator(object):
     def __init__(self):
-        self.start = 0
-        self.stop = 100
         self.sample_rate = 500
         self.frequency = 100
         self.amplitude = 3
-        self.time_position = 0.0
 
         self.start = 0
         self.end = 0
         self.amount = 0
 
-
-        self.signal_to_generate = "Sawtooth"
+        self.signal_to_generate = "Sinus"
         self.time_vector = None
         self.Signal = None
-        #self.generate_time_vector()
-        #self.generate_sinus(0)
-        
-        #self.new_point(0)
+
     def new_point(self,start, end, amount):
-        #self.time_position = time_position
         self.start = start
         self.end = end
         self.amount = amount

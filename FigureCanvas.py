@@ -30,10 +30,11 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.signal_generator_reader = SignalGeneratorReader(self.abtastrate, Signalgenerator)
         self.live_signal_reader = ValueReader(self.abtastrate)
 
-        self.live_active = True
-        self.generator_active = False
+        self.live_active = False
+        self.generator_active = True
 
-        self.x_offset_percent = 0
+        self.trigger_x_offset_percent = 0
+        self.trigger_position = 0
         self.point_to_update = 0
 
         self.number_of_boxes = 10
@@ -43,12 +44,9 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.offset_y_percent = 0
         self.offset_y = 0
 
-        self.interval= 33
-
         self.triggered = False
         self.trigger_percent = 0
         self.trigger_value = 0
-        self.trigger_position = 0
 
         self.need_to_update = True
 
@@ -57,21 +55,19 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.inverted = False
 
         self.screen_filled = False
-
+        self.interval = 33
         FigureCanvas.__init__(self, mpl_fig.Figure())
 
         # Store two lists _x_ and _y_
         self.x = np.linspace(0, 1, num=self.abtastrate)
-        self.saved_y = [0] * self.abtastrate
-        self.old_y = [0] * self.abtastrate
-        self.data_to_show = [0] * self.abtastrate
+        self.current_data_showing = [0] * self.abtastrate
         self.all_data = [0] * self.abtastrate
+        self.combined_signals = []
 
-        self.test_point = 0
 
         # Store a figure and ax
         self._ax_ = self.figure.subplots()
-        self._line_, = self._ax_.plot(self.x, self.saved_y)
+        self._line_, = self._ax_.plot(self.x, self.all_data)
         self._ax_.grid(which='major', axis='both')
 
         self.x_tick_boxes = np.linspace(0,self.time_per_box * (self.number_of_boxes), num=self.number_of_boxes+1)
@@ -82,7 +78,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self._ax_.set_ylim(ymin=(-self.voltage_per_box + self.offset_y) * self.number_of_boxes / 2, ymax=(self.voltage_per_box + self.offset_y) * self.number_of_boxes / 2)
 
         # Call superclass constructors
-        anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(self.saved_y,), interval=self.interval, blit=False)
+        anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(self.all_data,), interval=self.interval, blit=False)
         return
 
     def _update_canvas_(self, i, y) -> None:
@@ -94,10 +90,6 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         signal_generator_values = self.signal_generator_reader.get_read_values()
         mic_values = self.live_signal_reader.get_read_values()
         shorter_array = mic_values
-
-
-
-
 
         "Die Länge der Arrays vom Signalgenerator und den Mikrophon Aufnahmen sind nicht immer gleich, daher werden Werte des Mikrophon gespeichert, während" \
         "beim Signalgenerator resampled wird, da dieses mit der Zeit die fehlende Anzahl der Werte einholen wird" \
@@ -117,25 +109,28 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
             self.signal_generator_reader.reset_values(0)
             self.live_signal_reader.reset_values(0)
 
+        self.combined_signals = []
+
         for i in range(len(shorter_array)):
-            if self.generator_active:
-                new_point = signal_generator_values[i] + self.offset_y
+            if self.generator_active and self.live_active:
+                new_point = signal_generator_values[i] + self.offset_y + mic_values[i]
             elif self.live_active:
                 new_point = self.offset_y + mic_values[i]
             else:
-                new_point = signal_generator_values[i] + self.offset_y + mic_values[i]
-            self.all_data.append(new_point)
-            self.all_data.pop(0)
+                new_point = signal_generator_values[i] + self.offset_y
+
+            self.combined_signals.append(new_point)
+            #self.all_data.append(new_point)
+            #self.all_data.pop(0)
             self.look_for_trigger_condition(new_point)
             if self.triggered:
                 self.update_point(new_point)
             else:
                 pass
-                #self.old_y.append(new_point)
-                #self.old_y.pop(0)
+        self.update_all_data()
 
         if self.need_to_update:
-            self._line_.set_ydata(self.old_y)
+            self._line_.set_ydata(self.current_data_showing)
             self.need_to_update = False
         return
 
@@ -144,29 +139,20 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.smaller_than_trigger_found = False
         self.bigger_than_trigger_found = False
 
-    def write_new_values_in_old_array(self):
-       # amount_left = self.trigger_position
-       # old_relevant = self.saved_y[:self.trigger_position]
-        #new_relevant = self.saved_y[self.trigger_position:]
-        old_relevant = self.all_data[:self.trigger_position]
-        new_relevant = self.all_data[self.trigger_position:]
-
-        self.old_y = old_relevant + new_relevant
-
-        print("old_y" + str(len(self.old_y)))
-        print("saved_y" + str(len(self.saved_y)))
-
+    def update_all_data(self):
+        if len(self.combined_signals) >= len(self.all_data):
+            self.all_data = self.combined_signals[len(self.combined_signals)-len(self.all_data):]
+        else:
+            self.all_data = numpy.append(self.all_data[len(self.combined_signals):], self.combined_signals)
     def update_point(self, new_point):
-        if self.point_to_update >= len(self.saved_y):
+        if self.point_to_update >= len(self.all_data):
             self.point_to_update = self.trigger_position
-            self.test_point = self.trigger_position
-            self.saved_y[self.point_to_update] = new_point
-
             self.need_to_update = True
             self.reset_trigger()
-            self.write_new_values_in_old_array()
-        else:
-            self.saved_y[self.point_to_update] = new_point
+            self.update_all_data()
+            self.combined_signals = []
+            self.current_data_showing = self.all_data[:]
+
         self.point_to_update += 1
 
     def look_for_trigger_condition(self, new_point):
@@ -190,19 +176,18 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
 
         number_of_values = int(total_time * self.abtastrate)
         self.x = np.linspace(0, total_time, num=number_of_values)
-        self.saved_y = [0] * number_of_values
-        self.old_y = [0] * number_of_values
         self.all_data = [0] * number_of_values
+        self.current_data_showing = [0] * number_of_values
 
         self.set_x_labels()
         self.point_to_update = self.trigger_position
-        self._line_.set_data(self.x,self.saved_y)
+        self._line_.set_data(self.x, self.current_data_showing)
+
 
     def set_x_labels(self):
         total_time = self.time_per_box * self.number_of_boxes
-        trigger_position = self.x_offset_percent * total_time
-        self.trigger_position = int(trigger_position * self.abtastrate)
-        print(self.trigger_position)
+        trigger_position = self.trigger_x_offset_percent * total_time
+        self.trigger_position = int(self.trigger_x_offset_percent * total_time * self.abtastrate)
         self.x_tick_boxes = np.linspace(0, total_time, num=self.number_of_boxes+1)
 
         "Trigger Position an letzter Stelle, sodass der Strich als letztes gezeichnet/beschriftet wird (wenn nicht, kann er von den leeren Labels überschrieben werden)"
@@ -271,7 +256,7 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         pass
 
     def set_posx(self,value):
-        self.x_offset_percent = (value+1) * 0.01
+        self.trigger_x_offset_percent = (value+1) * 0.01
         self.set_x_labels()
 
     def set_posy(self, value):

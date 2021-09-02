@@ -30,7 +30,6 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.add_functions()
         self.createMenuBar()
 
-
         self.show()
 
     def window_settings(self):
