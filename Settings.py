@@ -39,7 +39,7 @@ class Settingswindow(QWidget):
         self.bottomRightGroupBox = QGroupBox("Input Settings")
 
         self.label = QLabel('Woher soll das Signal bezogen werden ?')
-        self.rbtn1 = QRadioButton('Aus Datei lesen')
+        self.rbtn1 = QRadioButton('Mikrofon')
         self.rbtn1.toggled.connect(self.set_file_signal)
 
         self.rbtn2 = QRadioButton('generiertes Signal')
@@ -66,7 +66,7 @@ class Settingswindow(QWidget):
 
         layout = QVBoxLayout()
         layout.addWidget(self.label)
-        #layout.addWidget(self.rbtn1)
+        layout.addWidget(self.rbtn1)
         layout.addWidget(self.rbtn2)
         layout.addWidget(self.freelabel)
         layout.addWidget(self.label2)
@@ -85,8 +85,8 @@ class Settingswindow(QWidget):
             self.myFig.set_generated_signal()
     def set_file_signal(self):
         if self.rbtn1.isChecked():
-            print("Signal ist nun file")
-            self.myFig.set_file_signal()
+            print("Signal wird übers Mikrofon gelesen")
+            self.myFig.set_mikrofon()
     
     def check_inverted(self, state):
         if state == QtCore.Qt.Checked:

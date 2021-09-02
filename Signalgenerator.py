@@ -11,16 +11,25 @@ class SignalGenerator(object):
         self.amplitude = 3
         self.time_position = 0.0
 
+        self.start = 0
+        self.end = 0
+        self.amount = 0
 
-        self.signal_to_generate = "Sinus"
+
+        self.signal_to_generate = "Sawtooth"
         self.time_vector = None
         self.Signal = None
         #self.generate_time_vector()
         #self.generate_sinus(0)
         
-        self.new_point(0)
-    def new_point(self,time_position):
-        self.time_position = time_position
+        #self.new_point(0)
+    def new_point(self,start, end, amount):
+        #self.time_position = time_position
+        self.start = start
+        self.end = end
+        self.amount = amount
+
+        self.generate_time_vector(start, end, amount)
         
         if self.signal_to_generate == "Sinus":
             self.generate_sinus()
@@ -30,27 +39,21 @@ class SignalGenerator(object):
             self.generate_sawtooth()
         return(self.Signal)
 
-    def generate_time_vector(self):
-        self.time_vector = np.linspace(start=self.start,stop=self.stop,num=self.sample_rate)
+    def generate_time_vector(self, start, end, amount):
+        self.time_vector = np.linspace(start=start,stop=end ,num=amount)
 
     def generate_sinus(self):
-        #Sinus = self.amplitude*np.sin(2*np.pi*self.frequency*self.time_vector)
-
-        Sinus = self.amplitude*np.sin(2*np.pi* self.frequency * self.time_position) +random.randint(0,3) * 0.1 * self.amplitude
+        Sinus = self.amplitude*np.sin(2*np.pi* self.frequency * self.time_vector) #+random.randint(0,3) * 0.1 * self.amplitude
         self.Signal = Sinus
         return(Sinus)
 
     def generate_square(self):
-        #Square = signal.square(2*np.pi*self.frequency*self.time_vector)
-        Square = self.amplitude*signal.square(2*np.pi* self.frequency * self.time_position)
-        
+        Square = self.amplitude*signal.square(2*np.pi* self.frequency * self.time_vector)
         self.Signal = Square
         return(Square)
 
     def generate_sawtooth(self):
-        #t = np.linspace(start=start,stop=stop,num=sample_rate,endpoint=True)
-        #Sawtooth = signal.sawtooth(2*np.pi*Frequency*t)
-        Sawtooth = self.amplitude*signal.sawtooth(2*np.pi* self.frequency * self.time_position)
+        Sawtooth = self.amplitude*signal.sawtooth(2*np.pi* self.frequency * self.time_vector)
         self.Signal = Sawtooth
         return(Sawtooth)
 

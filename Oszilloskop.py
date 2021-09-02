@@ -3,26 +3,13 @@ from typing import *
 import sys
 import os
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
-# from PyQt5 import QtWidgets, QtCore
-from matplotlib.backends.backend_qt5agg import FigureCanvas
-# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import matplotlib as mpl
-import matplotlib.figure as mpl_fig
-import matplotlib.animation as anim
-import numpy as np
-from PyQt5.QtCore import QDateTime, Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
-        QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-        QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-        QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget,QLCDNumber)
-from PyQt5.QtWidgets import QMenuBar
-from PyQt5.QtWidgets import QMenu
+from PyQt5.QtWidgets import (QDial, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
+        QVBoxLayout,QLCDNumber)
+
 
 from FigureCanvas import MyFigureCanvas
-from Frequenzanalyse import Frequenzcanvas
 from Signalgenerator import SignalGenerator
-from PyQt5.QtWidgets import QMainWindow, QAction, qApp, QApplication
+from PyQt5.QtWidgets import QAction
 from PyQt5.QtGui import QIcon
 
 from Settings import Settingswindow
@@ -121,13 +108,13 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.label_frequenzg.setText("Hz")
 
         self.label_time = QLabel()
-        self.label_time.setText("s")
+        self.label_time.setText("ms")
 
         self.label_voltage = QLabel()
         self.label_voltage.setText("V")
 
         self.label_trigger = QLabel()
-        self.label_trigger.setText("V")
+        self.label_trigger.setText("%")
         
         self.label_posx = QLabel()
         self.label_posx.setText("%")
@@ -239,11 +226,11 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout = QHBoxLayout()
 
         self.lcd_trigger = QLCDNumber()
-        self.lcd_trigger.display(100)
+        self.lcd_trigger.display(50)
 
 
         self.dial_trigger = QDial()
-        self.dial_trigger.setValue(30)
+        self.dial_trigger.setValue(50)
         self.dial_trigger.setNotchesVisible(True)
         
 
@@ -301,7 +288,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         getValue = self.dial_time.value()
         wert = self.give_me_exponential(getValue) *0.01
 
-        self.lcd_time.display(wert)
+        self.lcd_time.display(wert * 1000)
         self.myFig.set_time(wert)
     
     def dial_voltage_changed(self):
