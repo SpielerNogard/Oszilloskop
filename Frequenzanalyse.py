@@ -48,6 +48,8 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         y = self.myFig.current_data_showing
         x = self.myFig.x
 
+        self._ax_.set_ylim(ymin=0, ymax= self.myFig.voltage_per_box * self.myFig.number_of_boxes / 2)
+
         # Number of sample points
         N = len(x)
 

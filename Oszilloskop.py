@@ -1,7 +1,5 @@
 from __future__ import annotations
-from typing import *
 import sys
-import os
 from matplotlib.backends.qt_compat import QtCore, QtWidgets
 from PyQt5.QtWidgets import (QDial, QGridLayout, QGroupBox, QHBoxLayout, QLabel,
         QVBoxLayout,QLCDNumber)
@@ -124,7 +122,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.bottomLeftGroupBox = QGroupBox("Frequenzgenerator")
 
         self.lcd_amplitude = QLCDNumber()
-        self.lcd_amplitude.display(100)
+        self.lcd_amplitude.display(1)
         
         self.lcd_frequenz = QLCDNumber()
         self.lcd_frequenz.display(100)
@@ -133,14 +131,14 @@ class Oszilloskop(QtWidgets.QMainWindow):
         frequenzbox = QGroupBox("Frequenz")
 
         self.dial_amplitude = QDial()
-        self.dial_amplitude.setValue(30)
+        self.dial_amplitude.setValue(1)
         self.dial_amplitude.setNotchesVisible(True)
-        
+
 
         self.dial_frequenz = QDial()
-        self.dial_frequenz.setValue(30)
+        self.dial_frequenz.setValue(50)
         self.dial_frequenz.setNotchesVisible(True)
-        
+
 
         layoutamp = QHBoxLayout()
         layoutamp.addWidget(self.dial_amplitude)
@@ -188,11 +186,11 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout = QHBoxLayout()
 
         self.lcd_time = QLCDNumber()
-        self.lcd_time.display(100)
+        self.lcd_time.display(50)
 
 
         self.dial_time = QDial()
-        self.dial_time.setValue(30)
+        self.dial_time.setValue(50)
         self.dial_time.setNotchesVisible(True)
         
 
@@ -207,11 +205,11 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout = QHBoxLayout()
 
         self.lcd_voltage = QLCDNumber()
-        self.lcd_voltage.display(100)
+        self.lcd_voltage.display(1)
 
 
         self.dial_voltage = QDial()
-        self.dial_voltage.setValue(30)
+        self.dial_voltage.setValue(1)
         self.dial_voltage.setNotchesVisible(True)
         
         layout.addWidget(self.dial_voltage)
@@ -225,7 +223,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout = QHBoxLayout()
 
         self.lcd_trigger = QLCDNumber()
-        self.lcd_trigger.display(50)
+        self.lcd_trigger.display(0)
 
 
         self.dial_trigger = QDial()
@@ -242,20 +240,20 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.graphpositionbox = QGroupBox("GraphPositionnierung")
 
         self.lcd_posx = QLCDNumber()
-        self.lcd_posx.display(100)
+        self.lcd_posx.display(0)
 
         self.lcd_posy = QLCDNumber()
-        self.lcd_posy.display(100)
+        self.lcd_posy.display(0)
 
         x_box = QGroupBox("X Position")
         y_box = QGroupBox("Y Position")
         self.dial_pos_x = QDial()
-        self.dial_pos_x.setValue(30)
+        self.dial_pos_x.setValue(50)
         self.dial_pos_x.setNotchesVisible(True)
         
 
         self.dial_pos_y = QDial()
-        self.dial_pos_y.setValue(30)
+        self.dial_pos_y.setValue(50)
         self.dial_pos_y.setNotchesVisible(True)
         
 
