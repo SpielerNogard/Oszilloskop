@@ -62,7 +62,7 @@ class FrequenzWindow(QWidget):
 
         self.dial_start = QDial()
         self.dial_start.setValue(0)
-        self.dial_start.setRange(-2, 14)  # 20 - 20.000 Hz
+        self.dial_start.setRange(-2, 14)  # 0.2 - 20.000 Hz
         self.dial_start.setNotchesVisible(True)
         self.dial_start.valueChanged.connect(self.dial_start_changed)
 
@@ -81,7 +81,7 @@ class FrequenzWindow(QWidget):
 
         self.dial_stop = QDial()
         self.dial_stop.setValue(13)
-        self.dial_stop.setRange(-2, 14)      # 20 - 20.000 Hz
+        self.dial_stop.setRange(-2, 14)      # 0.2 - 20.000 Hz
         self.dial_stop.setNotchesVisible(True)
         self.dial_stop.valueChanged.connect(self.dial_stop_changed)
 

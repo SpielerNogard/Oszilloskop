@@ -41,7 +41,13 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
-        y = self.myFig.current_data_showing
+
+        y = []
+        x = self.myFig.x
+        if self.myFig.screen_filled:
+            y = self.myFig.current_data_showing
+        else:
+            y = self.myFig.all_data
         x = self.myFig.x
 
         self._ax_.set_ylim(ymin=0, ymax= self.myFig.voltage_per_box * self.myFig.number_of_boxes / 2)

@@ -137,8 +137,8 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
 
         self.dial_frequenz = QDial()
-        self.dial_frequenz.setValue(0)
-        self.dial_frequenz.setRange(-2, 13)      # 20 - 20.000 Hz
+        self.dial_frequenz.setValue(6)
+        self.dial_frequenz.setRange(0, 13)      # 0.5 - 20.000 Hz
         self.dial_frequenz.setNotchesVisible(True)
 
 
@@ -247,12 +247,12 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.lcd_posx.display(0)
 
         self.lcd_posy = QLCDNumber()
-        self.lcd_posy.display(0)
+        self.lcd_posy.display(50)
 
         x_box = QGroupBox("X Position")
         y_box = QGroupBox("Y Position")
         self.dial_pos_x = QDial()
-        self.dial_pos_x.setValue(50)
+        self.dial_pos_x.setValue(0)
         self.dial_pos_x.setNotchesVisible(True)
         
 
