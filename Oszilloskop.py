@@ -122,21 +122,23 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.bottomLeftGroupBox = QGroupBox("Frequenzgenerator")
 
         self.lcd_amplitude = QLCDNumber()
-        self.lcd_amplitude.display(1)
+        self.lcd_amplitude.display(0.1)
         
         self.lcd_frequenz = QLCDNumber()
-        self.lcd_frequenz.display(100)
+        self.lcd_frequenz.display(20)
 
         amplitudebox = QGroupBox("Amplitude")
         frequenzbox = QGroupBox("Frequenz")
 
         self.dial_amplitude = QDial()
         self.dial_amplitude.setValue(1)
+        self.dial_amplitude.setRange(0,10)
         self.dial_amplitude.setNotchesVisible(True)
 
 
         self.dial_frequenz = QDial()
-        self.dial_frequenz.setValue(50)
+        self.dial_frequenz.setValue(0)
+        self.dial_frequenz.setRange(-2, 13)      # 20 - 20.000 Hz
         self.dial_frequenz.setNotchesVisible(True)
 
 
@@ -186,11 +188,12 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout = QHBoxLayout()
 
         self.lcd_time = QLCDNumber()
-        self.lcd_time.display(50)
+        self.lcd_time.display(10)
 
 
         self.dial_time = QDial()
-        self.dial_time.setValue(50)
+        self.dial_time.setRange(-15, 0)  # 0.01 ms bis 1000ms (für insgesamt 10 Sekunden Aufnahme)
+        self.dial_time.setValue(-6)  # 10 ms
         self.dial_time.setNotchesVisible(True)
         
 
@@ -205,11 +208,12 @@ class Oszilloskop(QtWidgets.QMainWindow):
         layout = QHBoxLayout()
 
         self.lcd_voltage = QLCDNumber()
-        self.lcd_voltage.display(1)
+        self.lcd_voltage.display(0.1)
 
 
         self.dial_voltage = QDial()
         self.dial_voltage.setValue(1)
+        self.dial_voltage.setRange(1,10)
         self.dial_voltage.setNotchesVisible(True)
         
         layout.addWidget(self.dial_voltage)
@@ -227,7 +231,7 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
 
         self.dial_trigger = QDial()
-        self.dial_trigger.setValue(50)
+        self.dial_trigger.setValue(0)
         self.dial_trigger.setNotchesVisible(True)
         
 
@@ -283,13 +287,13 @@ class Oszilloskop(QtWidgets.QMainWindow):
 
     def dial_time_changed(self):
         getValue = self.dial_time.value()
-        wert = self.give_me_exponential(getValue) *0.01
+        wert = self.give_me_exponential(getValue)
 
         self.lcd_time.display(wert * 1000)
         self.myFig.set_time(wert)
     
     def dial_voltage_changed(self):
-        getValue = self.dial_voltage.value()
+        getValue = self.dial_voltage.value() * 0.1
         self.lcd_voltage.display(getValue)
         self.myFig.set_voltage(getValue)
 
@@ -299,13 +303,13 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.myFig.set_trigger(getValue)
 
     def dial_amplitude_changed(self):
-        getValue = self.dial_amplitude.value()
+        getValue = self.dial_amplitude.value() * 0.1
         self.lcd_amplitude.display(getValue)
         self.myFig.set_amplitude(getValue)
 
     def dial_frequenz_changed(self):
         getValue = self.dial_frequenz.value()
-        wert = self.give_me_exponential(getValue) * 10
+        wert = self.give_me_exponential(getValue)
 
         self.lcd_frequenz.display(wert)
         self.myFig.set_frequenz(wert)
@@ -321,13 +325,16 @@ class Oszilloskop(QtWidgets.QMainWindow):
         self.myFig.set_posy(getValue)
 
     def give_me_exponential(self,i):
-        i = math.floor(i/5)
-        wert = math.pow(2,i)
-        rounds = math.floor((i-2)/3)+1
-        for k in range(rounds):
-            wert = wert+math.pow(10,k)*math.pow(2,i-(2+3*k))
+        wert = 1
+        if i%3 == 1:
+            wert = 2
+        if i%3 == 2:
+            wert = 5
 
-        return(wert * 0.001)
+        power_of_ten = math.floor(i/3)
+        wert = wert * math.pow(10, power_of_ten)
+        return wert
+
 if __name__ == "__main__":
     qapp = QtWidgets.QApplication(sys.argv)
     app = Oszilloskop()

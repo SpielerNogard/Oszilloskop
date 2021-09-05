@@ -1,20 +1,20 @@
-import pyaudio
+from __future__ import annotations
+
+import numpy
+from matplotlib.backends.backend_qt5agg import FigureCanvas
+
+import matplotlib.figure as mpl_fig
+import matplotlib.pyplot as plt
+import matplotlib.animation as anim
 import numpy as np
-import pylab
+
 import time
+import threading
+import pyaudio
 
-RATE = 44100
-CHUNK = int(RATE/20) # RATE / number of updates per second
+def Main():
+    print(np.sin(2*np.pi *20000 * 2.0/44100) -np.sin(2*np.pi *20000 * 3.0/44100) )
 
-def soundplot(stream):
-    data = np.frombuffer(stream.read(CHUNK),dtype=np.int16)
+if __name__ == "__main__":
+    Main()
 
-if __name__=="__main__":
-    p=pyaudio.PyAudio()
-    stream=p.open(format=pyaudio.paInt16,channels=1,rate=RATE,input=True,
-                  frames_per_buffer=CHUNK)
-    for i in range(int(20*RATE/CHUNK)): #do this for 10 seconds
-        soundplot(stream)
-    stream.stop_stream()
-    stream.close()
-    p.terminate()

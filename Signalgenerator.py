@@ -1,12 +1,11 @@
 import numpy as np
-import random
 from scipy import signal
 
 class SignalGenerator(object):
     def __init__(self):
         self.sample_rate = 500
-        self.frequency = 100
-        self.amplitude = 3
+        self.frequency = 20
+        self.amplitude = 0.1
 
         self.start = 0
         self.end = 0
@@ -35,7 +34,7 @@ class SignalGenerator(object):
         self.time_vector = np.linspace(start=start,stop=end ,num=amount)
 
     def generate_sinus(self):
-        Sinus = self.amplitude*np.sin(2*np.pi* self.frequency * self.time_vector) #+random.randint(0,3) * 0.1 * self.amplitude
+        Sinus = self.amplitude*np.sin(2*np.pi* self.frequency * self.time_vector)
         self.Signal = Sinus
         return(Sinus)
 

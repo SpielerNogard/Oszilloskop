@@ -20,16 +20,12 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         '''
 
         self.myFig = myFig
-
-
-        interval = 20
+        interval = 33
 
         self.start_frequenz = 0
-        self.stop_frequenz = 1000
-
+        self.stop_frequenz = 20000
 
         FigureCanvas.__init__(self, mpl_fig.Figure())
-
 
         self._ax_ = self.figure.subplots()
         self._ax_.set_ylim(ymin=0, ymax=5)

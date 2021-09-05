@@ -1,24 +1,6 @@
 from __future__ import annotations
-from typing import *
-import sys
-import os
-from matplotlib.backends.qt_compat import QtCore, QtWidgets
-# from PyQt5 import QtWidgets, QtCore
-from matplotlib.backends.backend_qt5agg import FigureCanvas
-# from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
-import matplotlib as mpl
-import matplotlib.figure as mpl_fig
-import matplotlib.animation as anim
-import numpy as np
-from PyQt5.QtCore import QDateTime, Qt, QTimer
-from PyQt5.QtWidgets import (QApplication, QCheckBox, QComboBox, QDateTimeEdit,
-        QDial, QDialog, QGridLayout, QGroupBox, QHBoxLayout, QLabel, QLineEdit,
-        QProgressBar, QPushButton, QRadioButton, QScrollBar, QSizePolicy,
-        QSlider, QSpinBox, QStyleFactory, QTableWidget, QTabWidget, QTextEdit,
-        QVBoxLayout, QWidget,QLCDNumber)
+from PyQt5.QtWidgets import (QDial, QGridLayout, QGroupBox, QHBoxLayout, QLabel,QVBoxLayout, QWidget,QLCDNumber)
 
-
-from Frequenzanalyse import Frequenzcanvas
 import math
 class FrequenzWindow(QWidget):
     """
@@ -37,7 +19,6 @@ class FrequenzWindow(QWidget):
         self.lyt.addWidget(self.freqbox, 1, 0)
         self.lyt.addWidget(self.topRightGroupBox, 1, 1)
         self.setLayout(self.lyt)
-        #self.show()
 
     def create_labels(self):
         self.label_freqstart = QLabel()
@@ -76,11 +57,12 @@ class FrequenzWindow(QWidget):
         layout = QHBoxLayout()
 
         self.lcd_start = QLCDNumber()
-        self.lcd_start.display(100)
+        self.lcd_start.display(20)
 
 
         self.dial_start = QDial()
-        self.dial_start.setValue(30)
+        self.dial_start.setValue(0)
+        self.dial_start.setRange(-2, 14)  # 20 - 20.000 Hz
         self.dial_start.setNotchesVisible(True)
         self.dial_start.valueChanged.connect(self.dial_start_changed)
 
@@ -95,11 +77,11 @@ class FrequenzWindow(QWidget):
         layout = QHBoxLayout()
 
         self.lcd_stop = QLCDNumber()
-        self.lcd_stop.display(100)
-
+        self.lcd_stop.display(20000)
 
         self.dial_stop = QDial()
-        self.dial_stop.setValue(30)
+        self.dial_stop.setValue(13)
+        self.dial_stop.setRange(-2, 14)      # 20 - 20.000 Hz
         self.dial_stop.setNotchesVisible(True)
         self.dial_stop.valueChanged.connect(self.dial_stop_changed)
 
@@ -110,21 +92,34 @@ class FrequenzWindow(QWidget):
 
     def dial_start_changed(self):
         getValue = self.dial_start.value()
+        stop_value = self.dial_stop.value()
+
+        if getValue >= stop_value:
+            getValue = stop_value - 1
+            self.dial_start.setValue(getValue)
+
         wert = self.give_me_exponential(getValue)
         self.lcd_start.display(wert)
         self.myFigfre.set_start_frequenz(wert)
     
     def dial_stop_changed(self):
         getValue = self.dial_stop.value()
+        start_value = self.dial_start.value()
+        if getValue <= start_value:
+            getValue = start_value + 1
+            self.dial_stop.setValue(getValue)
+
         wert = self.give_me_exponential(getValue)
         self.lcd_stop.display(wert)
         self.myFigfre.set_stop_frequenz(wert)
 
     def give_me_exponential(self,i):
-        i = math.floor(i/5)
-        wert = math.pow(2,i)
-        rounds = math.floor((i-2)/3)+1
-        for k in range(rounds):
-            wert = wert+math.pow(10,k)*math.pow(2,i-(2+3*k))
+        wert = 1
+        if i%3 == 1:
+            wert = 2
+        if i%3 == 2:
+            wert = 5
 
-        return(wert * 0.1)
+        power_of_ten = math.floor(i/3)
+        wert = wert * math.pow(10, power_of_ten)
+        return wert
