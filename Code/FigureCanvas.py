@@ -11,6 +11,8 @@ import time
 import threading
 import pyaudio
 
+import math
+
 class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
     '''
     This is the FigureCanvas in which the live plot is drawn.
@@ -38,8 +40,8 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.point_to_update = 0
 
         self.number_of_boxes = 10
-        self.time_per_box = 1
-        self.voltage_per_box = 1
+        self.time_per_box = 0.01
+        self.voltage_per_box = 0.1
 
         self.offset_y_percent = 0
         self.offset_y = 0
@@ -59,9 +61,9 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         FigureCanvas.__init__(self, mpl_fig.Figure())
 
         # Store two lists _x_ and _y_
-        self.x = np.linspace(0, 1, num=self.abtastrate)
-        self.current_data_showing = [0] * self.abtastrate
-        self.all_data = [0] * self.abtastrate
+        self.x = np.linspace(0, 1, num=self.abtastrate + 1)
+        self.current_data_showing = [0] * (self.abtastrate + 1)
+        self.all_data = [0] * (self.abtastrate + 1)
         self.combined_signals = []
 
 
@@ -70,15 +72,12 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self._line_, = self._ax_.plot(self.x, self.all_data)
         self._ax_.grid(which='major', axis='both')
 
-        self.x_tick_boxes = np.linspace(0,self.time_per_box * (self.number_of_boxes), num=self.number_of_boxes+1)
-
-        y_voltage_point = (self.voltage_per_box * self.number_of_boxes)/2
-
-        self.y_tick_boxes = np.linspace(-y_voltage_point,y_voltage_point, num=self.number_of_boxes + 1)
-        self._ax_.set_ylim(ymin=(-self.voltage_per_box + self.offset_y) * self.number_of_boxes / 2, ymax=(self.voltage_per_box + self.offset_y) * self.number_of_boxes / 2)
+        self.set_time(0.01)
+        self.set_voltage(0.1)
 
         # Call superclass constructors
         anim.FuncAnimation.__init__(self, self.figure, self._update_canvas_, fargs=(self.all_data,), interval=self.interval, blit=False)
+
         return
 
     def _update_canvas_(self, i, y) -> None:
@@ -87,31 +86,26 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
+
         signal_generator_values = self.signal_generator_reader.get_read_values()
         mic_values = self.live_signal_reader.get_read_values()
-        shorter_array = mic_values
+        shorter_array_length = len(mic_values)
 
         "Die Länge der Arrays vom Signalgenerator und den Mikrophon Aufnahmen sind nicht immer gleich, daher werden Werte des Mikrophon gespeichert, während" \
         "beim Signalgenerator resampled wird, da dieses mit der Zeit die fehlende Anzahl der Werte einholen wird" \
         " Signalgenerator ~ 44110 Hz" \
         " Mikrophon ~ 44090 Hz "
-        if len(signal_generator_values) > len(mic_values):
+        if len(signal_generator_values) >= len(mic_values):
             self.signal_generator_reader.reset_values(0)
             self.live_signal_reader.reset_values(0)
-            shorter_array = mic_values
 
         elif len(mic_values) > len(signal_generator_values):
             self.signal_generator_reader.reset_values(0)
             self.live_signal_reader.reset_values(len(mic_values) - len(signal_generator_values))
-            shorter_array = signal_generator_values
+            shorter_array_length = len(signal_generator_values)
 
-        else:
-            self.signal_generator_reader.reset_values(0)
-            self.live_signal_reader.reset_values(0)
-
-        self.combined_signals = []
-
-        for i in range(len(shorter_array)):
+        i = 0
+        while i < shorter_array_length:
             if self.generator_active and self.live_active:
                 new_point = signal_generator_values[i] + self.offset_y + mic_values[i]
             elif self.live_active:
@@ -119,19 +113,28 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
             else:
                 new_point = signal_generator_values[i] + self.offset_y
 
+            if self.inverted:
+                new_point = - new_point
+
             self.combined_signals.append(new_point)
-            #self.all_data.append(new_point)
-            #self.all_data.pop(0)
-            self.look_for_trigger_condition(new_point)
-            if self.triggered:
-                self.update_point(new_point)
+
+            if not self.triggered:
+                self.look_for_trigger_condition(new_point)
             else:
-                pass
+                self.update_point()
+
+            i += 1
+            self.previous_point = new_point
+
         self.update_all_data()
+        self.combined_signals = []
 
         if self.need_to_update:
             self._line_.set_ydata(self.current_data_showing)
             self.need_to_update = False
+
+        elif not self.screen_filled:
+            self._line_.set_ydata(self.all_data)
         return
 
     def reset_trigger(self):
@@ -143,16 +146,17 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         if len(self.combined_signals) >= len(self.all_data):
             self.all_data = self.combined_signals[len(self.combined_signals)-len(self.all_data):]
         else:
-            self.all_data = numpy.append(self.all_data[len(self.combined_signals):], self.combined_signals)
-    def update_point(self, new_point):
+            self.all_data = self.all_data[len(self.combined_signals):] + self.combined_signals
+
+    def update_point(self):
         if self.point_to_update >= len(self.all_data):
             self.point_to_update = self.trigger_position
             self.need_to_update = True
             self.reset_trigger()
             self.update_all_data()
             self.combined_signals = []
-            self.current_data_showing = self.all_data[:]
-
+            self.current_data_showing = self.all_data
+            self.screen_filled = True
         self.point_to_update += 1
 
     def look_for_trigger_condition(self, new_point):
@@ -164,30 +168,37 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         elif self.inverted and not self.bigger_than_trigger_found and new_point > self.trigger_value :
             self.bigger_than_trigger_found = True
 
-        elif not self.inverted and self.bigger_than_trigger_found and new_point < self.trigger_value :
+        elif self.inverted and self.bigger_than_trigger_found and new_point < self.trigger_value:
             self.smaller_than_trigger_found = True
 
         if self.smaller_than_trigger_found and self.bigger_than_trigger_found:
             self.triggered = True
 
+            self.point_to_update += 1
+
     def set_time(self, time):
         self.time_per_box = time
-        total_time = self.time_per_box * self.number_of_boxes
+        "die +10 sind ein kleiner Buffer, sodass bei kleinen Zeiteinstellungen es immer noch ordentlich angezeigt werden kann mit 44.100 Hz"
+        total_time = math.floor(self.time_per_box * self.number_of_boxes * self.abtastrate + 10) / self.abtastrate
 
-        number_of_values = int(total_time * self.abtastrate)
+        number_of_values = int(total_time * self.abtastrate) +1
         self.x = np.linspace(0, total_time, num=number_of_values)
-        self.all_data = [0] * number_of_values
-        self.current_data_showing = [0] * number_of_values
 
+        self.all_data = [0] * (number_of_values)
+        self.current_data_showing = [0] * (number_of_values)
+        self.screen_filled = False
+        self.point_to_update = 0
         self.set_x_labels()
-        self.point_to_update = self.trigger_position
         self._line_.set_data(self.x, self.current_data_showing)
 
 
     def set_x_labels(self):
         total_time = self.time_per_box * self.number_of_boxes
-        trigger_position = self.trigger_x_offset_percent * total_time
-        self.trigger_position = int(self.trigger_x_offset_percent * total_time * self.abtastrate)
+
+        trigger_position = int(self.trigger_x_offset_percent * total_time * self.abtastrate)
+
+        self.trigger_position = trigger_position
+        trigger_position /= self.abtastrate
         self.x_tick_boxes = np.linspace(0, total_time, num=self.number_of_boxes+1)
 
         "Trigger Position an letzter Stelle, sodass der Strich als letztes gezeichnet/beschriftet wird (wenn nicht, kann er von den leeren Labels überschrieben werden)"
@@ -226,20 +237,18 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self._ax_.set_ylim(ymin=- y_voltage_point, ymax=y_voltage_point)
 
     def set_trigger(self, trigger):
-        #self.trigger_percent = (trigger - 50) * 2
-
         self.trigger_percent = (trigger - 50) * 2 * 0.01
-        #self.triggered = False
-        #self.bigger_than_trigger_found = False
-        #self.smaller_than_trigger_found = False
+        self.triggered = False
+        self.bigger_than_trigger_found = False
+        self.smaller_than_trigger_found = False
 
         self.set_y_labels()
 
     def set_amplitude(self, amplitude):
-        self.Signal_gen.amplitude = int(amplitude)
+        self.Signal_gen.amplitude = amplitude
 
     def set_frequenz(self, frequenz):
-        self.Signal_gen.frequency = float(frequenz)
+        self.Signal_gen.frequency = frequenz
 
     def set_inverted(self, invertet):
         self.inverted = invertet
@@ -252,8 +261,9 @@ class MyFigureCanvas(FigureCanvas, anim.FuncAnimation):
         self.generator_active = False
         self.live_active = True
 
-    def set_live_signal(self):
-        pass
+    def set_mikrofon_and_generated(self):
+        self.generator_active = True
+        self.live_active = True
 
     def set_posx(self,value):
         self.trigger_x_offset_percent = (value+1) * 0.01
@@ -325,10 +335,6 @@ class SignalGeneratorReader(threading.Thread):
 
 
     def read_chunk_of_values(self):
-        #for j in range(self.chunk_size):
-            #new_value = self.signal_generator.new_point(self.i * (1.0/self.abtastrate))
-            #self.read_values.append(new_value)
-
         new_value = self.signal_generator.new_point(self.i/self.abtastrate, (self.i + self.chunk_size) / self.abtastrate, self.chunk_size)
         self.i += self.chunk_size
         self.r += 1

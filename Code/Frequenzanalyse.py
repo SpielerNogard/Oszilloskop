@@ -20,16 +20,12 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         '''
 
         self.myFig = myFig
-
-
-        interval = 20
+        interval = 33
 
         self.start_frequenz = 0
-        self.stop_frequenz = 1000
-
+        self.stop_frequenz = 20000
 
         FigureCanvas.__init__(self, mpl_fig.Figure())
-
 
         self._ax_ = self.figure.subplots()
         self._ax_.set_ylim(ymin=0, ymax=5)
@@ -45,8 +41,16 @@ class Frequenzcanvas(FigureCanvas, anim.FuncAnimation):
         This function gets called regularly by the timer.
 
         '''
-        y = self.myFig.current_data_showing
+
+        y = []
         x = self.myFig.x
+        if self.myFig.screen_filled:
+            y = self.myFig.current_data_showing
+        else:
+            y = self.myFig.all_data
+        x = self.myFig.x
+
+        self._ax_.set_ylim(ymin=0, ymax= self.myFig.voltage_per_box * self.myFig.number_of_boxes / 2)
 
         # Number of sample points
         N = len(x)
